@@ -1,32 +1,16 @@
 const express = require('express');
+const {
+    getBootcamps,
+    getBootcamp,
+    createBootcamp,
+    updateBootcamp,
+    deleteBootcamp
+} = require('../controllers/bootcamps');
+
 const router = express.Router();
 
-router.get('/', function (req, res) {
-    res.status(200).json({ success: true, message: 'Show all bootcamps'});
-});
-
-router.get('/:id', function (req, res) {
-    res
-        .status(200)
-        .json({ success: true, message: `Show bootcamps wih id ${req.params.id}`});
-});
-
-router.post('/', function (req, res) {
-    res
-        .status(200)
-        .json({ success: true, message: 'Add new bootcamp'});
-});
-
-router.put('/:id', function (req, res) {
-    res
-        .status(200)
-        .json({ success: true, message: `Update bootcamp with id ${req.params.id}`});
-});
-
-router.delete('/:id', function (req, res) {
-    res
-        .status(200)
-        .json({ success: true, message: `Delete bootcamp with id ${req.params.id}`});
-});
+// We made GET and POST request to the same URL
+router.route('/').get(getBootcamps).post(createBootcamp);
+router.route('/:id').get(getBootcamp).put(updateBootcamp).delete(deleteBootcamp);
 
 module.exports = router;
