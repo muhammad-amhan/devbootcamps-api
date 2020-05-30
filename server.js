@@ -1,18 +1,19 @@
 const express = require('express');
 const env = require('dotenv');
-const logger = require('./middlware/logger');
 const morgan = require('morgan');
 const colors  = require('colors');
 
+const logger = require('./middlware/logger');
 const connectDB = require('./settings/database');
 
 env.config({path: './settings/config.env'});
-
 connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const environment = process.env.NODE_ENV;
+// JSON request body parser
+app.use(express.json());
 
 // Development logging middleware - debug
 if (process.env.NODE_ENV === 'development') {
@@ -22,7 +23,6 @@ if (process.env.NODE_ENV === 'development') {
 
 // Load resources
 const bootcamps = require('./routes/bootcamps');
-
 // Mount resources routers
 app.use('/api/v1/bootcamps', bootcamps);
 
