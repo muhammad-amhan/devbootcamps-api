@@ -1,4 +1,7 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
+const geocoder = require('../utils/geocoder');
+
 const Schema = mongoose.Schema;
 
 const BootcampSchema = new Schema({
@@ -96,6 +99,33 @@ const BootcampSchema = new Schema({
         type: Date,
         default: Date.now,
     },
+});
+
+// Mongoose hooks / middleware
+// Creates a slug from the bootcamp name e.g. test-bootcamp
+BootcampSchema.pre('save', function(next) {
+    this.slug = slugify(this.name, { lower: true });
+    next();                                              // Move on onto the next piece of middleware
+});
+
+// Creating a middleware to set the geo location of address field BEFORE saving to the database
+BootcampSchema.pre('save', async function(next) {
+    const location = await geocoder.geocode(this.address);
+    console.log(location);
+
+    this.location = {
+        type: 'Point',
+        coordinates: [location[0].longitude, location[0].latitude],
+        formattedAddress: location[0].formattedAddress,
+        street: location[0].streetName,
+        state: location[0].stateCode,
+        zipcode: location[0].zipcode,
+        country: location[0].countryCode,
+    }
+
+    // We no longer want address to be stored in the DB since we have obtained the above info
+    this.address = undefined;
+    next();
 });
 
 module.exports = mongoose.model('Bootcamp', BootcampSchema);
