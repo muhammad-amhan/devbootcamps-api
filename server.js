@@ -5,7 +5,7 @@ const colors  = require('colors');
 
 const logger = require('./middlware/logger');
 const connectDB = require('./settings/database');
-const errorHandler = require('./middlware/error_handling');
+const errorHandler = require('./middlware/error_handler');
 
 env.config({path: './settings/config.env'});
 connectDB();
@@ -14,18 +14,20 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const environment = process.env.NODE_ENV;
 
-
 // Development logging middleware - debug
 if (process.env.NODE_ENV === 'development') {
-    // app.use(morgan('dev')); // Instead, I will use the custom made middleware logger
-    app.use(logger);
+    // app.use(morgan('dev')); // Using the below request logger to simulate how morgan works
+    app.use(logger);  // Custom middleware logger
 }
-
 // Load resources
 const bootcamps = require('./routes/bootcamps');
 
 // Mount resources
 app.use('/api/v1/bootcamps', bootcamps);
+
+// Custom error handler - every middleware must run through app.use()
+// to be user in other resources such as bootcamps, it must come after mounting other resources
+app.use(errorHandler);
 
 // JSON request body parser
 app.use(express.json());
@@ -34,10 +36,6 @@ app.use(express.json());
 const server = app.listen(PORT, () => {
     console.log(`Server running in "${environment}" environment on port "${PORT}"...`.blue);
 });
-
-// Custom error handler - every middleware must run through app.use()
-// to be user in other resources such as bootcamps, it must come after mounting other resources
-app.use(errorHandler);
 
 // This is instead of having try and catch block in `database.js` to handle promise rejection by async functions
 process.on('unhandledRejection', (err, promise) => {
