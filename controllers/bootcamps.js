@@ -1,3 +1,4 @@
+const ErrorResponse = require('../utils/error_response');
 const Bootcamp = require('../models/Bootcamp');
 
 // @description         Get all bootcamps
@@ -26,7 +27,8 @@ exports.getBootcamp = async function (req, res, next) {
         const bootcamp = await Bootcamp.findById(req.params.id);
 
         if (!bootcamp) {
-            res.status(404).json({ success: false, error: 'Bootcamp not found' });
+            // res.status(404).json({ success: false, error: 'Bootcamp not found' });
+            next(new ErrorResponse('Bootcamp not found', 404));
             return; // Otherwise it will raise promise rejection indicating that headers already set
         }
         res.status(200).json({
@@ -35,7 +37,8 @@ exports.getBootcamp = async function (req, res, next) {
             data: bootcamp,
         });
     } catch (err) {
-        res.status(400).json({ success: false, error: err.message });
+        // res.status(500).json({ success: false, error: err.message });
+        next(new ErrorResponse('Misformatted ID', 400));
     }
 }
 
