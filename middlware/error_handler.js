@@ -3,7 +3,6 @@ const ErrorResponse = require('../utils/error_response');
 const errorHandler = (err, req, res, next) => {
     console.log(`Error: ${err.name}`.red);
     console.log(`Message: ${err.message}`.red);
-    console.log(err);
 
     // Copy the properties of `err` to `error`
     let error = { ...err };
