@@ -22,15 +22,15 @@ if (process.env.NODE_ENV === 'development') {
 // Load resources
 const bootcamps = require('./routes/bootcamps');
 
+// JSON request body parser
+app.use(express.json());
+
 // Mount resources
 app.use('/api/v1/bootcamps', bootcamps);
 
 // Custom error handler - every middleware must run through app.use()
 // to be user in other resources such as bootcamps, it must come after mounting other resources
 app.use(errorHandler);
-
-// JSON request body parser
-app.use(express.json());
 
 // We assigned the server to a variable to be able to terminate the server on promise rejection exceptions
 const server = app.listen(PORT, () => {

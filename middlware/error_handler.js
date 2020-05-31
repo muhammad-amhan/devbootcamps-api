@@ -1,22 +1,44 @@
 const ErrorResponse = require('../utils/error_response');
 
 const errorHandler = (err, req, res, next) => {
-    console.log(err.name.red);
-    console.log(err.message.red);
+    console.log(`Error: ${err.name}`.red);
+    console.log(`Message: ${err.message}`.red);
+    console.log(err);
 
     // Copy the properties of `err` to `error`
     let error = { ...err };
-    error.message = err.message;
+    let message = err.message;
 
     // Bad object format - CastError
     if (err.name === 'CastError') {
-        const message = `Resource with ID "${err.value}" was not found`;
+        message = `Resource with ID "${err.value}" was not found`;
         error = new ErrorResponse(message, 404);
+    }
+
+    // Mongoose duplicate key error (name)
+    if (err.code === 11000) {
+        message = `The name "${err.keyValue['name']}" already exists`;
+        error = new ErrorResponse(message, 400);
+    }
+
+    if (err.name === 'ValidationError') {
+        let missingProperties = []
+        Object.values(err.errors).map(name => missingProperties.push(name.path));
+        message = 'Missing required field(s) ';
+
+        for (let i = 0; i < missingProperties.length; i++) {
+            if (i > 0) {
+                message += (i < missingProperties.length - 1) ? ', ' : ' and ';
+            }
+            message += `"${missingProperties[i]}"`;
+        }
+
+        error = new ErrorResponse(message, 400);
     }
 
     res.status(error.statusCode || 500).json({
         success: false,
-        error: error.message || 'Internal server error',
+        error: message || 'Internal Server Error',
     });
 }
 
