@@ -1,6 +1,41 @@
 const Bootcamp = require('../models/Bootcamp');
 const ErrorResponse = require('../utils/error_response');
 const asyncHandler = require('../middlware/async_handler');
+const geocoder = require('../utils/geocoder');
+
+// @description         Get all bootcamps
+// @route               GET /api/v1/bootcamps/:postcode/:distance
+// @access              Public
+const getBootcampByLocationRadius = asyncHandler(async function (req, res, next) {
+    // Get the latitude and longitude from the postcode /zipcode and distance
+    const { zipcode, distance } = req.params;
+    const clientLoc = await geocoder.geocode(zipcode);
+    console.log(clientLoc);
+
+    const latitude = clientLoc[0].latitude;
+    const longitude = clientLoc[0].longitude;
+    const radius = distance / 3963;
+
+    const bootcamps = await Bootcamp.find({
+        location: {
+            $geoWithin: { $centerSphere: [ [ longitude, latitude ], radius ] }
+        }
+    });
+
+    if (bootcamps.length === 0) {
+        next(new ErrorResponse('No bootcamps found in this region, try to expand your circle.', 404))
+        return;
+    }
+
+    res.status(200).json({
+        success: true,
+        count: bootcamps.length,
+        data: bootcamps,
+    });
+});
+
+
+
 
 // @description         Get all bootcamps
 // @route               GET /api/v1/bootcamps
@@ -91,4 +126,5 @@ module.exports = {
     updateBootcamp,
     createBootcamp,
     deleteBootcamp,
+    getBootcampByLocationRadius ,
 }
