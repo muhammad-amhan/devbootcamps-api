@@ -19,6 +19,7 @@
     "slugify": "^1.4.0"
   },
   "devDependencies": {
+    "@types/mongoose": "^5.7.23",
     "nodemon": "^2.0.4"
   }
 }

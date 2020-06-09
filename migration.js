@@ -8,45 +8,52 @@ const dotenv = require('dotenv');
 dotenv.config({ path: './settings/config.env' });
 
 const Bootcamp = require('./models/Bootcamp');
+const Course = require('./models/Course');
+
 
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
     useFindAndModify: false,
+}).catch((err) => {
+    console.error(err.message);
+    process.exit(1);
 });
 
 // Parse JSON
-const bootcampsJsonPath = path.join(__dirname, '_data', 'bootcamps.json');
-const bootcamps = JSON.parse(fs.readFileSync(bootcampsJsonPath, 'utf-8'));
+const bootcampsJSONPath = path.join(__dirname, '_data', 'bootcamps.json');
+const courseJSONPath = path.join(__dirname, '_data', 'courses.json');
 
 // Import into DB
 const migrateData = async function () {
     try {
+        const bootcamps = JSON.parse(fs.readFileSync(bootcampsJSONPath, 'utf-8'));
+        const courses = JSON.parse(fs.readFileSync(courseJSONPath, 'utf-8'));
+
         await Bootcamp.create(bootcamps);
-       console.log('Data migrated successfully...'.green.inverse);
+        await Course.create(courses);
+        console.log('Data Imported successfully...'.green.inverse);
         process.exit(0);
 
     } catch (err) {
         console.error(err.message);
+        process.exit(1);
     }
 }
 
 const deleteData = async function () {
-    try {
-        await Bootcamp.deleteMany();
-        console.log('Data deleted successfully...'.red.inverse);
-        process.exit(0);
+    await Bootcamp.deleteMany({});
+    await Course.deleteMany({});
 
-    } catch (err) {
-        console.error(err.message);
-    }
+    console.log('Data deleted successfully...'.red.inverse);
+    process.exit(0);
 }
 
 // Create a command to invoke importing the data or remove them
 if ((process.argv[2] === 'migrate') || (process.argv[2] === '-m')) {
     // Handling the promise returned by async function
-    migrateData().catch(err => { console.error(err) });
+    migrateData().catch(err => { console.error(err.message) });
 
 } else if ((process.argv[2] === 'delete') || (process.argv[2] === '-d')) {
     deleteData().catch(err => { console.error(err); });
