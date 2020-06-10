@@ -32,7 +32,7 @@ const BootcampSchema = new Schema({
     email: {
         type: String,
         match: [
-            /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+            /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
             'Please enter a valid email',
         ],
     },
@@ -99,6 +99,10 @@ const BootcampSchema = new Schema({
         type: Date,
         default: Date.now,
     },
+},
+{
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
 });
 
 // Mongoose hooks / middleware
@@ -126,6 +130,14 @@ BootcampSchema.pre('save', async function(next) {
     // We no longer want address to be stored in the DB since we have obtained the above info
     this.address = undefined;
     next();
+});
+
+// Reverse populate with mongoose virtuals to support adding an array of courses in bootcamp objects
+BootcampSchema.virtual('courses', {
+    ref: 'Course',
+    localField: '_id',
+    foreignField: 'bootcamp',
+    justOne: false,
 });
 
 module.exports = mongoose.model('Bootcamp', BootcampSchema);

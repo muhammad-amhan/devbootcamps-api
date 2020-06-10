@@ -48,7 +48,11 @@ const getBootcamps = asyncHandler(async function (req, res, next) {
     reqQueryString = JSON.stringify(reqQuery);
     reqQueryString = reqQueryString.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
 
-    query = Bootcamp.find(JSON.parse(reqQueryString));
+    // Populating "courses" is done through mongoose virtuals and defined in Bootcamp model
+    query = Bootcamp.find(JSON.parse(reqQueryString)).populate({
+        path: 'courses',
+        select: 'title tuition',
+    });
 
     // Only show selected fields in bootcamps details
     if (req.query.select) {
@@ -61,7 +65,7 @@ const getBootcamps = asyncHandler(async function (req, res, next) {
         const sortBy = req.query.sort.split(',').join(' ');
         query = query.sort(sortBy);
     } else {
-        // Bootcamps shown in a descending order for chosen fields
+        // Descending order
         query = query.sort('-createdAt');
     }
 
@@ -184,7 +188,10 @@ const deleteBootcamp = asyncHandler(async function (req, res, next) {
         });
         return;
     }
-    res.status(200).json({ success: true, message: `Successfully deleted "${bootcamp.name}" bootcamp` });
+    res.status(200).json({
+        success: true,
+        message: `Successfully deleted "${bootcamp.name}" bootcamp`
+    });
 });
 
 // We could also export each function inline `exports.getBootcamps = ... ` instead of `const getBootcamps = ...`
