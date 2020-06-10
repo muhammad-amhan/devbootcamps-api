@@ -72,20 +72,16 @@ const getBootcamps = asyncHandler(async function (req, res, next) {
     // Pagination
     const pageNumber     = parseInt(req.query.page, 10);
     const limitNumber    = parseInt(req.query.limit, 10);
-
     const currentPage    = pageNumber > 0 ? pageNumber : 1;
     const limit          = limitNumber > 0 ? limitNumber : 20;
-
     const startIndex     = (currentPage - 1) * limit;
     const endIndex       = (currentPage * limit);
     const totalBootcamps = await Bootcamp.countDocuments();
 
     query = query.skip(startIndex).limit(limit);
-
     // Execute the Mongoose query
     bootcamps = await query;
 
-    // Format and include the pagination object in thr response
     let pagination = {};
 
     if (startIndex > 0) {
@@ -169,6 +165,7 @@ const updateBootcamp = asyncHandler(async function (req, res, next) {
         });
         return;
     }
+
     res.status(200).json({
         success: true,
         message: `Successfully updated your "${bootcamp.name}" bootcamp`,
@@ -180,7 +177,9 @@ const updateBootcamp = asyncHandler(async function (req, res, next) {
 // @route               DELETE /api/v1/bootcamps/:id
 // @access              Public
 const deleteBootcamp = asyncHandler(async function (req, res, next) {
-    const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
+    // We won't use `findByIdAndDelete` because we added a mongoose middleware that is triggered on `remove` to cascade delete courses
+    const bootcamp = await Bootcamp.findById(req.params.id);
+
     if (!bootcamp) {
         res.status(404).json({
             success: true,
@@ -188,6 +187,9 @@ const deleteBootcamp = asyncHandler(async function (req, res, next) {
         });
         return;
     }
+
+    bootcamp.remove();
+
     res.status(200).json({
         success: true,
         message: `Successfully deleted "${bootcamp.name}" bootcamp`
