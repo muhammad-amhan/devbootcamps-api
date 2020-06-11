@@ -1,4 +1,5 @@
 const express = require('express');
+
 const {
     getBootcamps,
     getBootcamp,
@@ -12,8 +13,9 @@ const {
 const courseRouter = require('./courses');
 
 const router = express.Router();
+
+// Forward the request to courses router
 router.use('/:bootcampId/courses', courseRouter);
-router.use('/courses', courseRouter);
 
 router
     .route('/:zipcode/:distance')

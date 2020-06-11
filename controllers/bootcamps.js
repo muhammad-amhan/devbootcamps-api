@@ -109,7 +109,6 @@ const getBootcamps = asyncHandler(async function (req, res, next) {
     res.status(200).json({
         success: true,
         count: bootcamps.length,
-        message: `Successfully fetched available bootcamps`,
         pagination: pagination,
         data: bootcamps,
     });
@@ -118,7 +117,7 @@ const getBootcamps = asyncHandler(async function (req, res, next) {
 // @description         Get a single bootcamp
 // @route               GET /api/v1/bootcamps/:id
 // @access              Public
-const getBootcamp = asyncHandler(async function (req, res, next) {
+const getBootcampById = asyncHandler(async function (req, res, next) {
     const bootcamp = await Bootcamp.findById(req.params.id);
 
     if (!bootcamp) {
@@ -131,7 +130,6 @@ const getBootcamp = asyncHandler(async function (req, res, next) {
 
     res.status(200).json({
         success: true,
-        message: `Successfully fetched "${bootcamp.name}" bootcamps`,
         data: bootcamp,
     });
 });
@@ -144,7 +142,7 @@ const createBootcamp = asyncHandler(async function (req, res, next) {
 
     res.status(200).json({
         success: true,
-        message: `Successfully created your "${req.body.name}" bootcamp`,
+        message: `Successfully created "${req.body.name}" bootcamp`,
         data: bootcamp,
     });
 });
@@ -199,7 +197,7 @@ const deleteBootcamp = asyncHandler(async function (req, res, next) {
 // We could also export each function inline `exports.getBootcamps = ... ` instead of `const getBootcamps = ...`
 module.exports = {
     getBootcamps,
-    getBootcamp,
+    getBootcamp: getBootcampById,
     updateBootcamp,
     createBootcamp,
     deleteBootcamp,

@@ -25,7 +25,7 @@ const CourseSchema = new Schema({
         enum: ['beginner', 'intermediate', 'advanced'],
         required: [true, 'Please specify the level of skill'],
     },
-    scholarship: {
+    scholarshipsAvailable: {
         type: Boolean,
         default: true,
     },
