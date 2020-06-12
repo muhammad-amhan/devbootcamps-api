@@ -4,6 +4,8 @@ const {
     getCourses,
     getCourseById,
     addCourse,
+    updateCourse,
+    deleteCourse,
 } = require('../controllers/courses');
 
 // Merging params because we shared this router in bootcamps
@@ -16,6 +18,8 @@ router
 
 router
     .route('/:id')
-    .get(getCourseById);
+    .get(getCourseById)
+    .put(updateCourse)
+    .delete(deleteCourse);
 
 module.exports = router;
