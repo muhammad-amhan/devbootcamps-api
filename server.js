@@ -1,11 +1,13 @@
-const express = require('express');
-const env = require('dotenv');
-const morgan = require('morgan');
-const colors  = require('colors');
+const express       = require('express');
+const env           = require('dotenv');
+const fileupload    = require('express-fileupload');
+const morgan        = require('morgan');
+const colors        = require('colors');
+const path          = require('path');
 
-const logger = require('./middlware/logger');
-const connectDB = require('./settings/database');
-const errorHandler = require('./middlware/error_handler');
+const logger        = require('./middlware/logger');
+const connectDB     = require('./settings/database');
+const errorHandler  = require('./middlware/error_handler');
 
 env.config({path: './settings/config.env'});
 connectDB();
@@ -19,12 +21,17 @@ if (process.env.NODE_ENV === 'development') {
     // app.use(morgan('dev')); // Using the below request logger to simulate how morgan works
     app.use(logger);  // Custom middleware logger
 }
+// Set static folder
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Load resources
 const bootcamps = require('./routes/bootcamps');
 const courses = require('./routes/courses');
 
 // JSON request body parser
 app.use(express.json());
+// File upload
+app.use(fileupload());
 
 // Mount resources
 app.use('/api/v1/bootcamps', bootcamps);

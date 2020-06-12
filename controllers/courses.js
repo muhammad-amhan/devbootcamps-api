@@ -1,8 +1,8 @@
 const ErrorResponse = require('../utils/error_response');
-const asyncHandler = require('../middlware/async_handler');
+const asyncHandler  = require('../middlware/async_handler');
 
-const Course = require('../models/Course');
-const Bootcamp = require('../models/Bootcamp');
+const Course        = require('../models/Course');
+const Bootcamp      = require('../models/Bootcamp');
 
 // @description         Get all courses for a specific bootcamp for forwarded route and all courses otherwise
 // @forwardedRoute      GET /api/v1/bootcamps/:bootcampId/courses

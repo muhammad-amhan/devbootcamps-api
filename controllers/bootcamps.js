@@ -1,7 +1,8 @@
-const Bootcamp = require('../models/Bootcamp');
+const Bootcamp      = require('../models/Bootcamp');
 const ErrorResponse = require('../utils/error_response');
-const asyncHandler = require('../middlware/async_handler');
-const geocoder = require('../utils/geocoder');
+const asyncHandler  = require('../middlware/async_handler');
+const geocoder      = require('../utils/geocoder');
+const path          = require('path');
 
 // @description         Get all bootcamps
 // @route               GET /api/v1/bootcamps/:postcode/:distance
@@ -10,7 +11,6 @@ const getBootcampByLocationRadius = asyncHandler(async function (req, res, next)
     // Get the latitude and longitude from the postcode /zipcode and distance
     const { zipcode, distance } = req.params;
     const clientLoc = await geocoder.geocode(zipcode);
-    console.log(clientLoc);
 
     const latitude = clientLoc[0].latitude;
     const longitude = clientLoc[0].longitude;
@@ -41,7 +41,7 @@ const getBootcamps = asyncHandler(async function (req, res, next) {
     let reqQuery = { ...req.query };
     let query, reqQueryString, blackListedQueries, bootcamps;
 
-    // Edge case: exclude "select" in a query string when specifying returned bootcamps fields
+    // Edge case: exclude e.g. "select" in a query string when specifying returned bootcamps fields
     blackListedQueries = ['select', 'sort', 'page', 'limit'];
     blackListedQueries.forEach(field => delete reqQuery[field]);
 
@@ -194,6 +194,53 @@ const deleteBootcamp = asyncHandler(async function (req, res, next) {
     });
 });
 
+// @description         Upload photo for a bootcamp
+// @route               PUT /api/v1/bootcamps/:id/photo
+// @access              Private
+const uploadBootcampPhoto = asyncHandler(async function (req, res, next) {
+    const bootcamp = await Bootcamp.findById(req.params.id);
+
+    if (!bootcamp) {
+        res.status(404).json({
+            success: true,
+            messages: 'Bootcamp not found',
+        });
+        return;
+    }
+
+    if (!req.files) {
+        return next(new ErrorResponse('Please select an image', 400));
+    }
+
+    const file = req.files.file;
+
+    if (!file.mimetype.startsWith('image')) {
+        return next(new ErrorResponse('Please upload an image file', 400));
+    }
+
+    if (file.size > process.env.MAX_FILE_UPLOADS) {
+        return next(
+            new ErrorResponse(`File is too large, please upload an image less than 
+                               ${process.env.MAX_FILE_UPLOADS}`, 400)
+        );
+    }
+
+    file.name = `photo_${bootcamp._id}${path.parse(file.name).ext}`;
+    file.mv(path.join(process.env.FILE_UPLOAD_PATH, file.name), async (err) => {
+        if (err) {
+            return next(new ErrorResponse('Problem with uploading the file', 500));
+        }
+    });
+
+    await Bootcamp.findByIdAndUpdate(req.params.id, { photo: file.name });
+
+    res.status(200).json({
+        success: true,
+        messages: 'Successfully changed bootcamp picture',
+        data: file.name,
+    });
+});
+
 // We could also export each function inline `exports.getBootcamps = ... ` instead of `const getBootcamps = ...`
 module.exports = {
     getBootcamps,
@@ -201,5 +248,6 @@ module.exports = {
     updateBootcamp,
     createBootcamp,
     deleteBootcamp,
-    getBootcampByLocationRadius ,
+    getBootcampByLocationRadius,
+    uploadBootcampPhoto,
 }
