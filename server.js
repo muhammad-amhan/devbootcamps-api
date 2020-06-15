@@ -27,6 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Load resources
 const bootcamps = require('./routes/bootcamps');
 const courses = require('./routes/courses');
+const auth = require('./routes/auth');
 
 // JSON request body parser
 app.use(express.json());
@@ -36,6 +37,7 @@ app.use(fileupload({}));
 // Mount resources
 app.use('/api/v1/bootcamps', bootcamps);
 app.use('/api/v1/courses', courses);
+app.use('/api/v1/auth', auth);
 
 // Custom error handler - every middleware must run through app.use()
 // to be user in other resources such as bootcamps, it must come after mounting other resources
