@@ -4,7 +4,7 @@ const errorHandler = (err, req, res, next) => {
     console.log(`Error: ${err.name}`.red);
     console.log(`Message: ${err.message}`.red);
 
-    let error = { ...err };
+    let error = {...err};
     let message = err.message;
 
     // Bad object format - CastError
@@ -38,6 +38,8 @@ const errorHandler = (err, req, res, next) => {
         success: false,
         error: message || 'Internal Server Error',
     });
-}
+
+    next();
+};
 
 module.exports = errorHandler;

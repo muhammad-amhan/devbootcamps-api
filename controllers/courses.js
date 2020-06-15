@@ -1,6 +1,5 @@
 const ErrorResponse = require('../utils/error_response');
 const asyncHandler  = require('../middlware/async_handler');
-
 const Course        = require('../models/Course');
 const Bootcamp      = require('../models/Bootcamp');
 
@@ -9,33 +8,23 @@ const Bootcamp      = require('../models/Bootcamp');
 // @route               GET /api/v1/courses
 // @access              Public
 const getCourses = asyncHandler(async function(req, res, next) {
-    let query;
-
     /** @namespace req.params.bootcampId **/
     if (req.params.bootcampId) {
-        query = Course.find({ bootcamp: req.params.bootcampId });
-    } else {
-        query = Course.find().populate({
-            path: 'bootcamp',
-            select: 'name',
-        }); // Also fetch the bootcamp details, specifically bootcamp name and description
-    }
+        const courses = await Course.find({ bootcamp: req.params.bootcampId });
 
-    const courses = await query;
+        if (courses.length === 0) {
+            return next(new ErrorResponse('No courses have been published yet', 404));
+        }
 
-    if (courses.length === 0) {
-        res.status(404).json({
+        res.status(200).json({
             success: true,
-            message: `No courses have been published yet`,
+            count: courses.length,
+            data: courses,
         });
-        return;
-    }
 
-    res.status(200).json({
-        success: true,
-        count: courses.length,
-        data: courses,
-    });
+    } else {
+        res.status(200).json(res.results);
+    }
 });
 
 // @description         Get a single course by ID
@@ -49,11 +38,7 @@ const getCourseById = asyncHandler(async function (req, res, next) {
     });
 
     if (!course) {
-        res.status(404).json({
-           success: true,
-           message: 'Course not found',
-        });
-        return;
+        return next(new ErrorResponse('Course not found', 404));
     }
 
     res.status(200).json({
@@ -70,11 +55,7 @@ const addCourse = asyncHandler(async function (req, res, next) {
     const bootcamp = Bootcamp.findById(req.params.bootcampId);
 
     if (!bootcamp) {
-        res.status(404).json({
-            success: true,
-            message: 'Cannot create course because the bootcamp is not found',
-        });
-        return;
+        return next(new ErrorResponse('Cannot create course because the bootcamp is not found', 404));
     }
 
     const course = await Course.create(req.body);
@@ -94,10 +75,7 @@ const updateCourse = asyncHandler(async function (req, res, next) {
     let course = await Course.findById(req.params.id);
 
     if (!course) {
-        res.status(404).json({
-            success: true,
-            message: `Course with the ID "${req.params.id}" is not found`,
-        });
+        return next(new ErrorResponse('Course not found', 404));
     }
 
     course = await Course.findByIdAndUpdate(req.params.id, req.body, {
@@ -120,10 +98,7 @@ const deleteCourse = asyncHandler(async function (req, res, next) {
     const course = await Course.findById(req.params.id);
 
     if (!course) {
-        res.status(404).json({
-            success: true,
-            message: `Course with the ID "${req.params.id}" is not found`,
-        });
+        return next(new ErrorResponse('Course not found', 404));
     }
 
     await course.remove({});

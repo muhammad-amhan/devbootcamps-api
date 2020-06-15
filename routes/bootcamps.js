@@ -2,13 +2,16 @@ const express = require('express');
 
 const {
     getBootcamps,
-    getBootcamp,
+    getBootcampById,
     getBootcampByLocationRadius,
     createBootcamp,
     updateBootcamp,
     deleteBootcamp,
     uploadBootcampPhoto,
 } = require('../controllers/bootcamps');
+
+const Bootcamp = require('../models/Bootcamp');
+const filterResults = require('../middlware/data_filter');
 
 // Include other resource routers
 const courseRouter = require('./courses');
@@ -24,12 +27,12 @@ router
 
 router
     .route('/')
-    .get(getBootcamps)
+    .get(filterResults(Bootcamp, 'courses'), getBootcamps)
     .post(createBootcamp);
 
 router
     .route('/:id')
-    .get(getBootcamp)
+    .get(getBootcampById)
     .put(updateBootcamp)
     .delete(deleteBootcamp);
 

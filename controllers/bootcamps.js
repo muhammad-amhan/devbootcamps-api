@@ -1,7 +1,7 @@
 const Bootcamp      = require('../models/Bootcamp');
 const ErrorResponse = require('../utils/error_response');
-const asyncHandler  = require('../middlware/async_handler');
 const geocoder      = require('../utils/geocoder');
+const asyncHandler  = require('../middlware/async_handler');
 const path          = require('path');
 
 // @description         Get all bootcamps
@@ -23,8 +23,7 @@ const getBootcampByLocationRadius = asyncHandler(async function (req, res, next)
     });
 
     if (bootcamps.length === 0) {
-        next(new ErrorResponse('No bootcamps found in this region, try to expand your circle.', 404))
-        return;
+        return next(new ErrorResponse('No bootcamps found in this region, try to expand your circle.', 404))
     }
 
     res.status(200).json({
@@ -38,80 +37,7 @@ const getBootcampByLocationRadius = asyncHandler(async function (req, res, next)
 // @route               GET /api/v1/bootcamps
 // @access              Public
 const getBootcamps = asyncHandler(async function (req, res, next) {
-    let reqQuery = { ...req.query };
-    let query, reqQueryString, blackListedQueries, bootcamps;
-
-    // Edge case: exclude e.g. "select" in a query string when specifying returned bootcamps fields
-    blackListedQueries = ['select', 'sort', 'page', 'limit'];
-    blackListedQueries.forEach(field => delete reqQuery[field]);
-
-    reqQueryString = JSON.stringify(reqQuery);
-    reqQueryString = reqQueryString.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
-
-    // Populating "courses" is done through mongoose virtuals and defined in Bootcamp model
-    query = Bootcamp.find(JSON.parse(reqQueryString)).populate({
-        path: 'courses',
-        select: 'title tuition',
-    });
-
-    // Only show selected fields in bootcamps details
-    if (req.query.select) {
-        const fields = req.query.select.split(',').join(' ');
-        query = query.select(fields);
-    }
-
-    // Sort bootcamps by specific field(s)
-    if (req.query.sort) {
-        const sortBy = req.query.sort.split(',').join(' ');
-        query = query.sort(sortBy);
-    } else {
-        // Descending order
-        query = query.sort('-createdAt');
-    }
-
-    // Pagination
-    const pageNumber     = parseInt(req.query.page, 10);
-    const limitNumber    = parseInt(req.query.limit, 10);
-    const currentPage    = pageNumber > 0 ? pageNumber : 1;
-    const limit          = limitNumber > 0 ? limitNumber : 20;
-    const startIndex     = (currentPage - 1) * limit;
-    const endIndex       = (currentPage * limit);
-    const totalBootcamps = await Bootcamp.countDocuments();
-
-    query = query.skip(startIndex).limit(limit);
-    // Execute the Mongoose query
-    bootcamps = await query;
-
-    let pagination = {};
-
-    if (startIndex > 0) {
-        pagination.previous = {
-            page: currentPage - 1,
-            limit: limit,
-        };
-    }
-
-    if (endIndex < totalBootcamps) {
-        pagination.next = {
-            page: currentPage + 1,
-            limit: limit,
-        };
-    }
-
-    if (bootcamps.length === 0) {
-        res.status(404).json({
-           success: true,
-           messages: 'No bootcamps found',
-        });
-        return;
-    }
-
-    res.status(200).json({
-        success: true,
-        count: bootcamps.length,
-        pagination: pagination,
-        data: bootcamps,
-    });
+    res.status(200).json(res.results);
 });
 
 // @description         Get a single bootcamp
@@ -121,11 +47,8 @@ const getBootcampById = asyncHandler(async function (req, res, next) {
     const bootcamp = await Bootcamp.findById(req.params.id);
 
     if (!bootcamp) {
-        res.status(404).json({
-            success: true,
-            messages: 'Bootcamp not found',
-        });
-        return; // Otherwise it will raise promise rejection indicating that headers already set
+        // The return is necessary, otherwise it will raise promise rejection indicating that headers already set
+        return next(new ErrorResponse('Bootcamp not found', 404));
     }
 
     res.status(200).json({
@@ -157,11 +80,7 @@ const updateBootcamp = asyncHandler(async function (req, res, next) {
     });
 
     if (!bootcamp) {
-        res.status(404).json({
-            success: true,
-            messages: 'Bootcamp not found',
-        });
-        return;
+        return next(new ErrorResponse('Bootcamp not found', 404));
     }
 
     res.status(200).json({
@@ -179,11 +98,7 @@ const deleteBootcamp = asyncHandler(async function (req, res, next) {
     const bootcamp = await Bootcamp.findById(req.params.id);
 
     if (!bootcamp) {
-        res.status(404).json({
-            success: true,
-            messages: 'Bootcamp not found',
-        });
-        return;
+        return next(new ErrorResponse('Bootcamp not found', 404));
     }
 
     bootcamp.remove();
@@ -201,11 +116,7 @@ const uploadBootcampPhoto = asyncHandler(async function (req, res, next) {
     const bootcamp = await Bootcamp.findById(req.params.id);
 
     if (!bootcamp) {
-        res.status(404).json({
-            success: true,
-            messages: 'Bootcamp not found',
-        });
-        return;
+        return next(new ErrorResponse('Bootcamp not found', 404));
     }
 
     if (!req.files) {
@@ -244,7 +155,7 @@ const uploadBootcampPhoto = asyncHandler(async function (req, res, next) {
 // We could also export each function inline `exports.getBootcamps = ... ` instead of `const getBootcamps = ...`
 module.exports = {
     getBootcamps,
-    getBootcamp: getBootcampById,
+    getBootcampById,
     updateBootcamp,
     createBootcamp,
     deleteBootcamp,

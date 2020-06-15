@@ -9,7 +9,7 @@ const logger        = require('./middlware/logger');
 const connectDB     = require('./settings/database');
 const errorHandler  = require('./middlware/error_handler');
 
-env.config({path: './settings/config.env'});
+env.config({ path: './settings/config.env' });
 connectDB();
 
 const app = express();
@@ -31,7 +31,7 @@ const courses = require('./routes/courses');
 // JSON request body parser
 app.use(express.json());
 // File upload
-app.use(fileupload());
+app.use(fileupload({}));
 
 // Mount resources
 app.use('/api/v1/bootcamps', bootcamps);
