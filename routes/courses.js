@@ -13,19 +13,20 @@ const Course = require('../models/Course');
 // TODO
 const checkBootcamp = require('../middlware/checks');
 const filterResults = require('../middlware/data_filter');
-const requireToken = require('../middlware/auth');
+const {
+    requireToken,
+} = require('../middlware/auth');
 
 // Merging params because we shared this router in bootcamps
 const router = express.Router({ mergeParams: true });
 
 router
     .route('/')
-    .get([
+    .get(
         filterResults(Course, {
             path: 'bootcamp',
             select: 'name',
-        })
-    ], getCourses)
+        }), getCourses)
     .post(requireToken, addCourse);
 
 router
