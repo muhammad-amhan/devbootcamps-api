@@ -1,3 +1,4 @@
+const ErrorResponse = require('../utils/error_response');
 
 const filterResults = (model, populate) => async (req, res, next) => {
     let reqQuery = { ...req.query };
@@ -58,13 +59,6 @@ const filterResults = (model, populate) => async (req, res, next) => {
             page: currentPage + 1,
             limit: limit,
         };
-    }
-
-    if (results.length === 0) {
-        return res.status(404).json({
-            success: true,
-            messages: `No ${model.toLowerCase()} found`,
-        });
     }
 
     res.results = {
