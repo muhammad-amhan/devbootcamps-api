@@ -5,7 +5,7 @@ const {
     getMe,
 } = require('../controllers/auth');
 
-const requireToken = require('../middlware/auth');
+const { requireToken } = require('../middlware/auth');
 
 const router = express.Router();
 

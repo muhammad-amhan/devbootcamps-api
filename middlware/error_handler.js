@@ -15,7 +15,7 @@ const errorHandler = (err, req, res, next) => {
 
     // Mongoose duplicate key error (name)
     if (err.code === 11000) {
-        const message = `The name "${err.keyValue['name']}" already exists`;
+        const message = `Bootcamp "${err.keyValue['name']}" already exists`;
         error = new ErrorResponse(message, 400);
     }
 
