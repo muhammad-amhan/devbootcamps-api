@@ -3,7 +3,7 @@ const asyncHandler = require('../middlware/async_handler');
 const User = require('../models/User');
 
 // @description         Register user
-// @route               GET /api/v1/auth/register
+// @route               POST /api/v1/auth/register
 // @access              Public
 const registerUser = asyncHandler(async function (req, res, next) {
     const { name, email, password, role } = req.body;
@@ -20,6 +20,33 @@ const registerUser = asyncHandler(async function (req, res, next) {
     });
 });
 
+// @description         Login
+// @route               POST /api/v1/auth/login
+// @access              Public
+const login = asyncHandler(async function (req, res, next) {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return next(new ErrorResponse('Email and password are required', 400));
+    }
+    // Search for user by email
+    const user = await User.findOne({ email: email }).select('+password');
+    if (!user) {
+        return next(new ErrorResponse('Invalid email or password'), 401);
+    }
+
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+        return next(new ErrorResponse('Invalid email or password'), 401);
+    }
+
+    res.status(200).json({
+        success: true,
+    });
+});
+
+
 module.exports = {
     registerUser,
+    login,
 }
