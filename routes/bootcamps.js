@@ -12,6 +12,7 @@ const {
 
 const Bootcamp = require('../models/Bootcamp');
 const filterResults = require('../middlware/data_filter');
+const requireToken = require('../middlware/auth');
 
 // Include other resource routers
 const courseRouter = require('./courses');
@@ -28,17 +29,17 @@ router
 router
     .route('/')
     .get(filterResults(Bootcamp, 'courses'), getBootcamps)
-    .post(createBootcamp);
+    .post(requireToken, createBootcamp);
 
 router
     .route('/:id')
     .get(getBootcampById)
-    .put(updateBootcamp)
-    .delete(deleteBootcamp);
+    .put(requireToken, updateBootcamp)
+    .delete(requireToken, deleteBootcamp);
 
 
 router
     .route('/:id/photo')
-    .put(uploadBootcampPhoto);
+    .put(requireToken, uploadBootcampPhoto);
 
 module.exports = router;

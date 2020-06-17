@@ -20,6 +20,7 @@ const UserSchema = new Schema({
     password: {
         type: String,
         minlength: 8,
+        // Does not retrieve the password when retrieving the user, unless specified with a select operator in the query
         select: false,
         required: [true, 'Password is required'],
     },

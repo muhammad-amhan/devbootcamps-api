@@ -59,7 +59,7 @@ const getBootcampById = asyncHandler(async function (req, res, next) {
 
 // @description         Create a new bootcamp
 // @route               POST /api/v1/bootcamps
-// @access              Public
+// @access              Private
 const createBootcamp = asyncHandler(async function (req, res, next) {
     const bootcamp = await Bootcamp.create(req.body);
 
@@ -72,7 +72,7 @@ const createBootcamp = asyncHandler(async function (req, res, next) {
 
 // @description         Update a single bootcamp
 // @route               PUT /api/v1/bootcamps/:id
-// @access              Public
+// @access              Private
 const updateBootcamp = asyncHandler(async function (req, res, next) {
     const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
@@ -92,7 +92,7 @@ const updateBootcamp = asyncHandler(async function (req, res, next) {
 
 // @description         Delete a single bootcamp
 // @route               DELETE /api/v1/bootcamps/:id
-// @access              Public
+// @access              Private
 const deleteBootcamp = asyncHandler(async function (req, res, next) {
     // We won't use `findByIdAndDelete` because we added a mongoose middleware that is triggered on `remove` to cascade delete courses
     const bootcamp = await Bootcamp.findById(req.params.id);
