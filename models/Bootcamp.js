@@ -99,8 +99,14 @@ const BootcampSchema = new Schema({
         type: Date,
         default: Date.now,
     },
+    user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+        required: true,
+    },
 },
 {
+    // Enable specific virtual fields we specify, to be included in the response
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
 });

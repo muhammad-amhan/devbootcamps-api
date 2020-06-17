@@ -1,15 +1,15 @@
-const fs = require('fs');
-const path = require('path');
-const mongoose = require('mongoose');
-const colors = require('colors');
-const dotenv = require('dotenv');
+const fs        = require('fs');
+const path      = require('path');
+const mongoose  = require('mongoose');
+const colors    = require('colors');
+const dotenv    = require('dotenv');
 
 // Load environment variables
 dotenv.config({ path: './settings/config.env' });
 
-const Bootcamp = require('./models/Bootcamp');
-const Course = require('./models/Course');
-
+const Bootcamp  = require('./models/Bootcamp');
+const Course    = require('./models/Course');
+const User      = require('./models/User');
 
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -23,16 +23,20 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Parse JSON
 const bootcampsJSONPath = path.join(__dirname, '_data', 'bootcamps.json');
-const courseJSONPath = path.join(__dirname, '_data', 'courses.json');
+const courseJSONPath    = path.join(__dirname, '_data', 'courses.json');
+const userJSONPath      = path.join(__dirname, '_data', 'users.json');
 
 // Import into DB
 const migrateData = async function () {
     try {
         const bootcamps = JSON.parse(fs.readFileSync(bootcampsJSONPath, 'utf-8'));
-        const courses = JSON.parse(fs.readFileSync(courseJSONPath, 'utf-8'));
+        const courses   = JSON.parse(fs.readFileSync(courseJSONPath, 'utf-8'));
+        const users     = JSON.parse(fs.readFileSync(userJSONPath, 'utf-8'));
 
         await Bootcamp.create(bootcamps);
         await Course.create(courses);
+        await User.create(users);
+
         console.log('Data Imported successfully...'.green.inverse);
         process.exit(0);
 
@@ -45,6 +49,7 @@ const migrateData = async function () {
 const deleteData = async function () {
     await Bootcamp.deleteMany({});
     await Course.deleteMany({});
+    await User.deleteMany({});
 
     console.log('Data deleted successfully...'.red.inverse);
     process.exit(0);
