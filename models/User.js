@@ -33,7 +33,7 @@ const UserSchema = new Schema({
     createdAt: {
         type: Date,
         default: Date.now(),
-    }
+    },
 });
 
 // Encrypt password
@@ -47,13 +47,14 @@ UserSchema.methods.getSignedJWT = function () {
     return jwt.sign(
         { id: this._id },
         process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRE });
-}
+        { expiresIn: process.env.JWT_EXPIRE }
+    );
+};
 
 // Match password with hashed password
 UserSchema.methods.matchPassword = async function (password) {
     return await bcrypt.compare(password, this.password);
-}
+};
 
 
 module.exports = mongoose.model('User', UserSchema);

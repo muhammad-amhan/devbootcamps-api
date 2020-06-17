@@ -7,17 +7,10 @@ const User = require('../models/User');
 // @access              Public
 const registerUser = asyncHandler(async function (req, res, next) {
     const { name, email, password, role } = req.body;
-
     // Instance methods of User model can be called on `user`
     const user = await User.create({ name, email, password, role });
-    const token = user.getSignedJWT();
 
-    res.status(200).json({
-        success: true,
-        message: 'Registered successfully',
-        token: token,
-        data: user,
-    });
+    sendToken(user, res, 'Registered successfully');
 });
 
 // @description         Login
@@ -40,13 +33,35 @@ const login = asyncHandler(async function (req, res, next) {
         return next(new ErrorResponse('Invalid email or password'), 401);
     }
 
-    res.status(200).json({
-        success: true,
-    });
+    sendToken(user, res, `Welcome ${user.name}`);
 });
+
+// Get JWT token and create cookie
+const sendToken = function (user, res, message) {
+    const jwt_token = user.getSignedJWT();
+
+    const options = {
+        // https://www.codeproject.com/Questions/607098/Cookieplusexpirationplus30plusdays
+        expires: new Date(Date.now() + (process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000)),
+        httpOnly: true,
+    };
+
+    if (process.env.NODE_ENV === 'production') {
+        options.secure = true;
+    }
+
+    res
+        .status(200)
+        .cookie('jwt_token', jwt_token, options)
+        .json({
+            success: true,
+            message: message,
+            data: user,
+        });
+};
 
 
 module.exports = {
     registerUser,
     login,
-}
+};

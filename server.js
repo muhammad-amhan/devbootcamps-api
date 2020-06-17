@@ -1,10 +1,10 @@
 const express       = require('express');
 const env           = require('dotenv');
-const fileupload    = require('express-fileupload');
+const fileUpload    = require('express-fileupload');
 const morgan        = require('morgan');
 const colors        = require('colors');
 const path          = require('path');
-
+const cookieParser  = require('cookie-parser');
 const logger        = require('./middlware/logger');
 const connectDB     = require('./settings/database');
 const errorHandler  = require('./middlware/error_handler');
@@ -32,7 +32,9 @@ const auth = require('./routes/auth');
 // JSON request body parser
 app.use(express.json());
 // File upload
-app.use(fileupload({}));
+app.use(fileUpload({}));
+// Cookie parser
+app.use(cookieParser());
 
 // Mount resources
 app.use('/api/v1/bootcamps', bootcamps);
