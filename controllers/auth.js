@@ -36,6 +36,41 @@ const login = asyncHandler(async function (req, res, next) {
     sendToken(user, res, `Welcome ${user.name}`);
 });
 
+// @description         Get current logged in user
+// @route               POST /api/v1/auth/me
+// @access              Private
+const getMe = asyncHandler(async function (req, res, next) {
+    const user = await User.findById(req.user.id);
+
+    res.status(200).json({
+        success: true,
+        data: user,
+    });
+});
+
+// @description         Reset password
+// @route               POST /api/v1/auth/resetpassword
+// @access              Public
+const resetPassword = asyncHandler(async function (req, res, next) {
+    const user = await User.findOne({ email: req.body.email });
+
+    if (!user) {
+        return next(new ErrorResponse('Email is not registered', 404));
+    }
+
+    const hashedResetToken = user.getResetPasswordToken();
+    // This will trigger the 'pre' mongoose middleware for saving a password when hitting this endpoint
+    // Go to User model for a workaround
+    await user.save({ validateBeforeSave: false });
+
+    res.status(200).json({
+        success: true,
+        message: 'A reset link will be sent to your email',
+        resetToken: hashedResetToken
+    });
+
+});
+
 // Get JWT token and create cookie
 const sendToken = function (user, res, message) {
     const jwt_token = user.getSignedJWT();
@@ -61,20 +96,10 @@ const sendToken = function (user, res, message) {
         });
 };
 
-// @description         Get current logged in user
-// @route               POST /api/v1/auth/me
-// @access              Private
-const getMe = asyncHandler(async function (req, res, next) {
-    const user = await User.findById(req.user.id);
-
-    res.status(200).json({
-        success: true,
-        data: user,
-    });
-});
 
 module.exports = {
     registerUser,
     login,
     getMe,
+    resetPassword,
 };
