@@ -1,3 +1,4 @@
+const crypto        = require('crypto');
 const ErrorResponse = require('../utils/error_response');
 const asyncHandler  = require('../middlware/async_handler');
 const sendEmail     = require('../utils/send_email');
@@ -49,6 +50,34 @@ const getMe = asyncHandler(async function (req, res, next) {
     });
 });
 
+// @description         Reset password
+// @route               PUT /api/v1/auth/resetpassword/:resetToken
+// @access              Public
+const resetPassword = asyncHandler(async function (req, res, next) {
+    const resetToken = crypto
+        .createHash('SHA256')
+        .update(req.params.resetToken)
+        .digest('hex');
+
+    // Find user by reset password token
+    const user = await User.findOne({
+        resetPasswordToken: resetToken,
+        resetPasswordExpire: { $gt: Date.now() },  // Make sure the token is not expired
+    });
+
+    if (!user) {
+        return next(new ErrorResponse('Token expired', 400));
+    }
+
+    user.password = req.body.password;
+
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save();
+
+    sendToken(user, res, 'Password changed successfully');
+});
+
 // @description         Forgot password
 // @route               POST /api/v1/auth/forgotpassword
 // @access              Public
@@ -62,7 +91,7 @@ const forgotPassword = asyncHandler(async function (req, res, next) {
     // This will trigger the 'pre' mongoose middleware for saving a password when hitting this endpoint
     // Go to User model for a workaround
     await user.save({ validateBeforeSave: false });
-    const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/resetpassword/${hashedResetToken}`;
+    const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/resetpassword/${hashedResetToken}`;
 
     const message = `You are receiving this email because you have requested a password reset. 
     Please make a PUT request to:\n\n ${resetUrl} \n If you have not requested a password reset, please ignore this email`
@@ -121,4 +150,5 @@ module.exports = {
     login,
     getMe,
     forgotPassword,
+    resetPassword,
 };
