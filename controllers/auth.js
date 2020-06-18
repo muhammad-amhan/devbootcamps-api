@@ -1,6 +1,7 @@
 const ErrorResponse = require('../utils/error_response');
-const asyncHandler = require('../middlware/async_handler');
-const User = require('../models/User');
+const asyncHandler  = require('../middlware/async_handler');
+const sendEmail     = require('../utils/send_email');
+const User          = require('../models/User');
 
 // @description         Register user
 // @route               POST /api/v1/auth/register
@@ -48,27 +49,45 @@ const getMe = asyncHandler(async function (req, res, next) {
     });
 });
 
-// @description         Reset password
-// @route               POST /api/v1/auth/resetpassword
+// @description         Forgot password
+// @route               POST /api/v1/auth/forgotpassword
 // @access              Public
-const resetPassword = asyncHandler(async function (req, res, next) {
+const forgotPassword = asyncHandler(async function (req, res, next) {
     const user = await User.findOne({ email: req.body.email });
 
     if (!user) {
         return next(new ErrorResponse('Email is not registered', 404));
     }
-
     const hashedResetToken = user.getResetPasswordToken();
     // This will trigger the 'pre' mongoose middleware for saving a password when hitting this endpoint
     // Go to User model for a workaround
     await user.save({ validateBeforeSave: false });
+    const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/resetpassword/${hashedResetToken}`;
 
-    res.status(200).json({
-        success: true,
-        message: 'A reset link will be sent to your email',
-        resetToken: hashedResetToken
-    });
+    const message = `You are receiving this email because you have requested a password reset. 
+    Please make a PUT request to:\n\n ${resetUrl} \n If you have not requested a password reset, please ignore this email`
 
+    try {
+        await sendEmail({
+            email: user.email,
+            subject: 'DevBootcamps Password Reset',
+            message: message,
+        });
+
+        res.status(200).json({
+            success: true,
+            message: 'A reset link have been sent to your email',
+            resetToken: hashedResetToken,
+        });
+    } catch (err) {
+        console.log(err);
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+
+        await user.save({ validateBeforeSave: false });
+
+        return next(new ErrorResponse('Could not send an email', 500));
+    }
 });
 
 // Get JWT token and create cookie
@@ -101,5 +120,5 @@ module.exports = {
     registerUser,
     login,
     getMe,
-    resetPassword,
+    forgotPassword,
 };

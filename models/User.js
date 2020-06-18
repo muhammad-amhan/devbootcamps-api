@@ -65,7 +65,7 @@ UserSchema.methods.matchPassword = async function (password) {
 
 // Generate and hash password token
 UserSchema.methods.getResetPasswordToken = function () {
-    const resetToken = crypto.randomBytes(20);  // Returns a bytes buffer (random token generated)
+    const resetToken = crypto.randomBytes(20).toString('hex');  // Returns a bytes buffer to string (random token generated)
 
     this.resetPasswordToken = crypto
         .createHash('SHA256')
@@ -73,6 +73,8 @@ UserSchema.methods.getResetPasswordToken = function () {
         .digest('hex');
 
     this.expirePasswordToken = Date.now() + 10 * 60 * 1000;
+
+    return resetToken;
 };
 
 module.exports = mongoose.model('User', UserSchema);

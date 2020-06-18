@@ -3,7 +3,7 @@ const {
     registerUser,
     login,
     getMe,
-    resetPassword,
+    forgotPassword,
 } = require('../controllers/auth');
 
 const { requireToken } = require('../middlware/auth');
@@ -13,6 +13,6 @@ const router = express.Router();
 router.post('/register', registerUser);
 router.post('/login', login);
 router.get('/me', requireToken, getMe);
-router.post('/resetpassword', resetPassword);
+router.post('/forgotpassword', forgotPassword);
 
 module.exports = router;
