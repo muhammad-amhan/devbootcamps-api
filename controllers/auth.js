@@ -27,12 +27,12 @@ const login = asyncHandler(async function (req, res, next) {
     // Search for user by email
     const user = await User.findOne({ email: email }).select('+password');
     if (!user) {
-        return next(new ErrorResponse('Invalid email or password'), 401);
+        return next(new ErrorResponse('Incorrect email or password'), 401);
     }
 
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-        return next(new ErrorResponse('Invalid email or password'), 401);
+        return next(new ErrorResponse('Incorrect email or password'), 401);
     }
 
     sendToken(user, res, `Welcome ${user.name}`);
@@ -46,6 +46,46 @@ const getMe = asyncHandler(async function (req, res, next) {
 
     res.status(200).json({
         success: true,
+        data: user,
+    });
+});
+
+// @description         Update user details
+// @route               PUT /api/v1/auth/updatepassword
+// @access              Private
+const updateUserPassword = asyncHandler(async function (req, res, next) {
+    const user = await User.findById(req.user.id).select('+password');
+
+    /** @namespace req.body.currentPassword **/
+    if (!(await user.matchPassword(req.body.currentPassword))) {
+        return next(new ErrorResponse('Incorrect password', 401));
+    }
+
+    /** @namespace req.body.newPassword **/
+    user.password = req.body.newPassword;
+
+    await user.save();
+
+    sendToken(user, res, 'Successfully updated your password');
+});
+
+// @description         Update user details
+// @route               PUT /api/v1/auth/updatedetails
+// @access              Private
+const updateUserDetails = asyncHandler(async function (req, res, next) {
+    const fields = {
+        name: req.body.name,
+        email: req.body.email,
+    };
+
+    const user = await User.findByIdAndUpdate(req.user.id, fields, {
+        new: true,
+        runValidators: true,
+    });
+
+    res.status(200).json({
+        success: true,
+        message: 'Successfully updated your details',
         data: user,
     });
 });
@@ -151,4 +191,6 @@ module.exports = {
     getMe,
     forgotPassword,
     resetPassword,
+    updateUserDetails,
+    updateUserPassword,
 };
