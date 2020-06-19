@@ -14,7 +14,7 @@ const getUsers = asyncHandler(async function (req, res, next) {
 // @description         Get a single user by ID
 // @route               GET /api/v1/users/:id
 // @access              Private (admins)
-const getUser = asyncHandler(async function (req, res, next) {
+const getUserById = asyncHandler(async function (req, res, next) {
     const user = await User.findById(req.params.id);
 
     if (!user) {
@@ -45,7 +45,13 @@ const createUser = asyncHandler(async function (req, res, next) {
 // @route               PUT /api/v1/users/:id
 // @access              Private (admins)
 const updateUser = asyncHandler(async function (req, res, next) {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    let user = await User.findById(req.params.id);
+
+    if (!user) {
+        return next(new ErrorResponse('User not found', 404));
+    }
+
+    user = await User.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
     });
@@ -63,7 +69,6 @@ const updateUser = asyncHandler(async function (req, res, next) {
 const deleteUser = asyncHandler(async function (req, res, next) {
     const user = await User.findById(req.params.id);
 
-    // TODO create a middleware for not found resource
     if (!user) {
         return next(new ErrorResponse('User not found', 404));
     }
@@ -79,7 +84,7 @@ const deleteUser = asyncHandler(async function (req, res, next) {
 
 module.exports = {
     getUsers,
-    getUser,
+    getUserById,
     createUser,
     updateUser,
     deleteUser,

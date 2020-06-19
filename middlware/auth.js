@@ -20,9 +20,16 @@ const requireToken = asyncHandler(async function (req, res, next) {
 
     try {
         const decoded = jwt.verify(jwt_token, process.env.JWT_SECRET);
-        req.user = await User.findById(decoded.id);
+        const user = await User.findById(decoded.id);
 
+        // Edge case - user could have been removed after they were authenticated
+        if (!user) {
+            return next(new ErrorResponse('User not found', 404));
+        }
+
+        req.user = user;
         next();
+
     } catch (err) {
         return next(new ErrorResponse('Not authenticated', 401));
     }

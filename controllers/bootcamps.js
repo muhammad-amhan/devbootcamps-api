@@ -87,19 +87,19 @@ const updateBootcamp = asyncHandler(async function (req, res, next) {
     if (!bootcamp) {
         return next(new ErrorResponse('Bootcamp not found', 404));
     }
-    // Verify bootcamp owner
+
     if ((bootcamp.user.toString() !== req.user.id) && (req.user.role !== 'admin')) {
-        return next(new ErrorResponse('You do not have permission to modify this resource', 401));
+        return next(new ErrorResponse(`You do not have permission to modify bootcamp "${bootcamp.name}"`, 401));
     }
 
     bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,  // Returns the new/updated object
+        new: true,  // Returns the updated object
         runValidators: true,
     });
 
     res.status(200).json({
         success: true,
-        message: `Successfully updated your "${bootcamp.name}" bootcamp`,
+        message: 'Successfully updated the bootcamp',
         data: bootcamp,
     });
 });
@@ -109,6 +109,7 @@ const updateBootcamp = asyncHandler(async function (req, res, next) {
 // @access              Private
 const deleteBootcamp = asyncHandler(async function (req, res, next) {
     // We won't use `findByIdAndDelete` because we added a mongoose middleware that is triggered on `remove` to cascade delete courses
+    // for the sake of consistency, we'll follow this pattern for deleting resources
     const bootcamp = await Bootcamp.findById(req.params.id);
 
     if (!bootcamp) {

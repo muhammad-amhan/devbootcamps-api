@@ -7,15 +7,18 @@ const errorHandler = (err, req, res, next) => {
     let error = {...err};
     error.message = err.message;
 
-    // Bad object format - CastError
+    // Bad Mongo ID format - CastError
     if (err.name === 'CastError') {
         const message = `Resource with ID "${err.value}" was not found`;
         error = new ErrorResponse(message, 404);
     }
 
-    // Mongoose duplicate key error (name)
+    // Mongoose duplicate key error
     if (err.code === 11000) {
-        const message = `Bootcamp "${err.keyValue['name']}" already exists`;
+        const key = Object.keys(err.keyValue)[0];
+        const value = err.keyValue[key];
+        const message = `"${value}" already exists`;
+
         error = new ErrorResponse(message, 400);
     }
 

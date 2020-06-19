@@ -50,7 +50,7 @@ const getCourseById = asyncHandler(async function (req, res, next) {
 // @description         Add a new course to a bootcamp
 // @route               POST /api/v1/bootcamps/:bootcampId/courses
 // @access              Private
-const addCourse = asyncHandler(async function (req, res, next) {
+const createCourse = asyncHandler(async function (req, res, next) {
     req.body.bootcamp = req.params.bootcampId;
     const bootcamp = await Bootcamp.findById(req.params.bootcampId);
 
@@ -84,9 +84,8 @@ const updateCourse = asyncHandler(async function (req, res, next) {
         return next(new ErrorResponse('Course not found', 404));
     }
 
-    // Verify the user is the course owner
     if ((course.user.toString() !== req.user.id) && (req.user.role !== 'admin')) {
-        return next(new ErrorResponse('You do not have permission to update the course', 401));
+        return next(new ErrorResponse(`You do not have permission to update the course "${course.title}"`, 401));
     }
 
     course = await Course.findByIdAndUpdate(req.params.id, req.body, {
@@ -127,7 +126,7 @@ const deleteCourse = asyncHandler(async function (req, res, next) {
 module.exports = {
     getCourses,
     getCourseById,
-    addCourse,
+    createCourse,
     updateCourse,
     deleteCourse,
 }

@@ -31,7 +31,7 @@ router
 
 router
     .route('/')
-    .get(filterResults(Bootcamp, 'courses'), getBootcamps)
+    .get(filterResults(Bootcamp, 'Bootcamps', 'courses'), getBootcamps)
     .post(requireToken, verifyUserRole('publisher', 'admin'), createBootcamp);
 
 router

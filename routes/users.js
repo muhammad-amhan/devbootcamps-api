@@ -7,7 +7,7 @@ const {
 
 const {
     getUsers,
-    getUser,
+    getUserById,
     createUser,
     updateUser,
     deleteUser,
@@ -27,7 +27,7 @@ router
 
 router
     .route('/:id')
-    .get(getUser)
+    .get(getUserById)
     .put(updateUser)
     .delete(deleteUser);
 

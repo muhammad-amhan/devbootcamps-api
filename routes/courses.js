@@ -3,7 +3,7 @@ const express = require('express');
 const {
     getCourses,
     getCourseById,
-    addCourse,
+    createCourse,
     updateCourse,
     deleteCourse,
 } = require('../controllers/courses');
@@ -18,11 +18,11 @@ const router = express.Router({ mergeParams: true });
 router
     .route('/')
     .get(
-        filterResults(Course, {
+        filterResults(Course, 'Courses',{
             path: 'bootcamp',
             select: 'name',
         }), getCourses)
-    .post(requireToken, addCourse);
+    .post(requireToken, createCourse);
 
 router
     .route('/:id')

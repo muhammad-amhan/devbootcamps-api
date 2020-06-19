@@ -1,6 +1,6 @@
 const ErrorResponse = require('../utils/error_response');
 
-const filterResults = (model, populate) => async (req, res, next) => {
+const filterResults = (model, resourceName, populate) => async (req, res, next) => {
     let reqQuery = { ...req.query };
     let query, reqQueryString, blackListedQueries, results;
 
@@ -61,6 +61,10 @@ const filterResults = (model, populate) => async (req, res, next) => {
         };
     }
 
+    if (results.length === 0) {
+        return next(new ErrorResponse(`${resourceName} not found`, 404));
+    }
+
     res.results = {
         success: true,
         count: results.length,
@@ -70,5 +74,6 @@ const filterResults = (model, populate) => async (req, res, next) => {
 
     next();
 };
+
 
 module.exports = filterResults;

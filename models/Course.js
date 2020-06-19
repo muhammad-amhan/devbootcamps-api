@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 const CourseSchema = new Schema({
     title: {
         type: String,
+        unique: true,
         trim: true,
         required: [true, 'Course title is required'],
     },

@@ -4,6 +4,7 @@ const logger = (req, res, next) => {
         let statusCode = res.statusCode;
         console.log(`${req.method} ${req.protocol}://${req.hostname}${req.originalUrl} ${statusCode}`.yellow);
     });
+
     next(); // Go to the next middleware
 }
 
