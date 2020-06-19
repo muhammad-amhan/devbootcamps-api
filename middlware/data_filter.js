@@ -33,12 +33,12 @@ const filterResults = (model, populate) => async (req, res, next) => {
     }
 
     // Pagination
-    const pageNumber     = parseInt(req.query.page, 10);
-    const limitNumber    = parseInt(req.query.limit, 10);
-    const currentPage    = pageNumber > 0 ? pageNumber : 1;
-    const limit          = limitNumber > 0 ? limitNumber : 20;
-    const startIndex     = (currentPage - 1) * limit;
-    const endIndex       = (currentPage * limit);
+    const pageNumber  = parseInt(req.query.page, 10);
+    const limitNumber = parseInt(req.query.limit, 10);
+    const currentPage = pageNumber > 0 ? pageNumber : 1;
+    const limit       = limitNumber > 0 ? limitNumber : 20;
+    const startIndex  = (currentPage - 1) * limit;
+    const endIndex    = (currentPage * limit);
 
     const resultsCount = await model.countDocuments();
 

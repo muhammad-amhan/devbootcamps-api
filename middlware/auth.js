@@ -1,7 +1,7 @@
-const jwt = require('jsonwebtoken');
-const asyncHandler = require('./async_handler');
+const asyncHandler  = require('./async_handler');
 const ErrorResponse = require('../utils/error_response');
-const User = require('../models/User');
+const jwt           = require('jsonwebtoken');
+const User          = require('../models/User');
 
 // Validate token
 const requireToken = asyncHandler(async function (req, res, next) {
@@ -15,7 +15,7 @@ const requireToken = asyncHandler(async function (req, res, next) {
     // }
 
     if (!jwt_token) {
-        return next(new ErrorResponse('Unauthorized', 401));
+        return next(new ErrorResponse('Not authenticated', 401));
     }
 
     try {
@@ -24,7 +24,7 @@ const requireToken = asyncHandler(async function (req, res, next) {
 
         next();
     } catch (err) {
-        return next(new ErrorResponse('Unauthorized', 401));
+        return next(new ErrorResponse('Not authenticated', 401));
     }
 });
 

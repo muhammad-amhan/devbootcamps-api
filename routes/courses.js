@@ -8,15 +8,10 @@ const {
     deleteCourse,
 } = require('../controllers/courses');
 
+const filterResults    = require('../middlware/data_filter');
+const { requireToken } = require('../middlware/auth');
+
 const Course = require('../models/Course');
-
-// TODO
-const checkBootcamp = require('../middlware/checks');
-const filterResults = require('../middlware/data_filter');
-const {
-    requireToken,
-} = require('../middlware/auth');
-
 // Merging params because we shared this router in bootcamps
 const router = express.Router({ mergeParams: true });
 
@@ -34,5 +29,6 @@ router
     .get(getCourseById)
     .put(requireToken, updateCourse)
     .delete(requireToken, deleteCourse);
+
 
 module.exports = router;

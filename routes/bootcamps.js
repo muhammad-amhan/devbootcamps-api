@@ -1,4 +1,6 @@
-const express = require('express');
+const express       = require('express');
+const Bootcamp      = require('../models/Bootcamp');
+const filterResults = require('../middlware/data_filter');
 
 const {
     getBootcamps,
@@ -10,14 +12,12 @@ const {
     uploadBootcampPhoto,
 } = require('../controllers/bootcamps');
 
-const Bootcamp = require('../models/Bootcamp');
-const filterResults = require('../middlware/data_filter');
 const {
     requireToken,
     verifyUserRole,
 } = require('../middlware/auth');
 
-// Include other resource routers
+// Include course resource routers
 const courseRouter = require('./courses');
 
 const router = express.Router();
@@ -40,9 +40,9 @@ router
     .put(requireToken, verifyUserRole('publisher', 'admin'), updateBootcamp)
     .delete(requireToken, verifyUserRole('publisher', 'admin'), deleteBootcamp);
 
-
 router
     .route('/:id/photo')
     .put(requireToken, verifyUserRole('publisher', 'admin'), uploadBootcampPhoto);
+
 
 module.exports = router;

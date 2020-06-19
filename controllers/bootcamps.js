@@ -123,7 +123,7 @@ const deleteBootcamp = asyncHandler(async function (req, res, next) {
 
     res.status(200).json({
         success: true,
-        message: `Successfully deleted "${bootcamp.name}" bootcamp`
+        message: `Successfully deleted the bootcamp "${bootcamp.name}"`
     });
 });
 

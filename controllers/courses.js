@@ -120,7 +120,7 @@ const deleteCourse = asyncHandler(async function (req, res, next) {
 
     res.status(200).json({
         success: true,
-        message: 'Successfully deleted the course',
+        message: `Successfully deleted the course "${course.title}"`,
     });
 });
 
