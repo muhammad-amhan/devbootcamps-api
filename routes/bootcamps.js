@@ -19,11 +19,13 @@ const {
 
 // Include course resource routers
 const courseRouter = require('./courses');
+const reviewsRouter = require('./reviews');
 
 const router = express.Router();
 
-// Forward the request to courses router
+// Forward the request to:
 router.use('/:bootcampId/courses', courseRouter);
+router.use('/:bootcampId/reviews', reviewsRouter);
 
 router
     .route('/:zipcode/:distance')

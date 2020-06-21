@@ -13,7 +13,7 @@ env.config({ path: './settings/config.env' });
 connectDB();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 const environment = process.env.NODE_ENV;
 
 // Development logging middleware - debug
@@ -29,6 +29,7 @@ const bootcamps = require('./routes/bootcamps');
 const courses   = require('./routes/courses');
 const auth      = require('./routes/auth');
 const users     = require('./routes/users');
+const reviews   = require('./routes/reviews');
 
 // JSON request body parser
 app.use(express.json());
@@ -42,14 +43,21 @@ app.use('/api/v1/bootcamps', bootcamps);
 app.use('/api/v1/courses', courses);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/users', users);
+app.use('/api/v1/reviews', reviews);
 
 // Custom error handler - every middleware must run through app.use()
 // to be user in other resources such as bootcamps, it must come after mounting other resources
 app.use(errorHandler);
 
+let port = process.argv[2] || PORT || 5000;
+
+if (port.includes('=')) {
+    port = port.split('=')[1];
+}
+
 // We assigned the server to a variable to be able to terminate the server on promise rejection exceptions
-const server = app.listen(PORT, () => {
-    console.log(`Server running in "${environment}" environment on port "${PORT}"...`.blue);
+const server = app.listen(port, () => {
+    console.log(`Server running in "${environment}" environment on port "${port}"...`.blue);
 });
 
 // This is instead of having try and catch block in `database.js` to handle promise rejection by async functions

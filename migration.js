@@ -10,6 +10,7 @@ dotenv.config({ path: './settings/config.env' });
 const Bootcamp  = require('./models/Bootcamp');
 const Course    = require('./models/Course');
 const User      = require('./models/User');
+const Review    = require('./models/Review');
 
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -23,19 +24,22 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Parse JSON
 const bootcampsJSONPath = path.join(__dirname, '_data', 'bootcamps.json');
-const courseJSONPath    = path.join(__dirname, '_data', 'courses.json');
-const userJSONPath      = path.join(__dirname, '_data', 'users.json');
+const coursesJSONPath   = path.join(__dirname, '_data', 'courses.json');
+const usersJSONPath     = path.join(__dirname, '_data', 'users.json');
+const reviewsJSONPath   = path.join(__dirname, '_data', 'reviews.json');
 
 // Import into DB
 const migrateData = async function () {
     try {
         const bootcamps = JSON.parse(fs.readFileSync(bootcampsJSONPath, 'utf-8'));
-        const courses   = JSON.parse(fs.readFileSync(courseJSONPath, 'utf-8'));
-        const users     = JSON.parse(fs.readFileSync(userJSONPath, 'utf-8'));
+        const courses   = JSON.parse(fs.readFileSync(coursesJSONPath, 'utf-8'));
+        const users     = JSON.parse(fs.readFileSync(usersJSONPath, 'utf-8'));
+        const reviews   = JSON.parse(fs.readFileSync(reviewsJSONPath, 'utf-8'));
 
         await Bootcamp.create(bootcamps);
         await Course.create(courses);
         await User.create(users);
+        await Review.create(reviews);
 
         console.log('Data Imported successfully...'.green.inverse);
         process.exit(0);
@@ -50,6 +54,7 @@ const deleteData = async function () {
     await Bootcamp.deleteMany({});
     await Course.deleteMany({});
     await User.deleteMany({});
+    await Review.deleteMany({});
 
     console.log('Data deleted successfully...'.red.inverse);
     process.exit(0);
