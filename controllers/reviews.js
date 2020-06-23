@@ -1,6 +1,7 @@
 const ErrorResponse = require('../utils/error_response');
 const asyncHandler  = require('../middlware/async_handler');
 const Review        = require('../models/Review');
+const Bootcamp      = require('../models/Bootcamp');
 
 // @description         Get all reviews for a specific bootcamp for forwarded route and all courses otherwise
 // @forwardedRoute      GET /api/v1/bootcamps/:bootcampId/reviews
@@ -45,8 +46,29 @@ const getReviewsById = asyncHandler(async function (req, res, next) {
     });
 });
 
+// @description         Add a new review to a bootcamp
+// @route               POST /api/v1/bootcamps/:bootcampId/reviews
+// @access              Private (admin, users)
+const createReview = asyncHandler(async function (req, res, next) {
+    req.body.bootcamp = req.params.bootcampId;
+    const bootcamp = await Bootcamp.findById(req.params.bootcampId);
+
+    if (!bootcamp) {
+        return next(new ErrorResponse('Cannot publish a review because the bootcamp is not found', 404));
+    }
+
+    req.body.user = req.user.id;
+    const review = await Review.create(req.body);
+
+    res.status(200).json({
+        success: true,
+        message: `Thank you for your review `,
+        data: review,
+    });
+});
 
 module.exports = {
     getReviews,
     getReviewsById,
+    createReview,
 }

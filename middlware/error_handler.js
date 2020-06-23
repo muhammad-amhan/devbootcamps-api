@@ -13,6 +13,7 @@ const errorHandler = (err, req, res, next) => {
         error = new ErrorResponse(message, 404);
     }
 
+    // TODO I dont like the error handling in general here
     // Mongoose duplicate key error
     if (err.code === 11000) {
         const key = Object.keys(err.keyValue)[0];

@@ -10,6 +10,7 @@ const {
 const {
     getReviews,
     getReviewsById,
+    createReview,
 } = require('../controllers/reviews');
 
 const router = express.Router({ mergeParams: true });
@@ -22,6 +23,7 @@ router
             select: 'name description',
         }
     ), getReviews)
+    .post(requireToken, verifyUserRole('user', 'admin'), createReview);
 
 router
     .route('/:id')

@@ -36,4 +36,9 @@ const ReviewSchema = new Schema({
     },
 });
 
+// Prevent users from adding more than one review per bootcamp
+// TODO come up with a better error response
+ReviewSchema.index({ bootcamp: 1, user: 1 }, { unique: true });
+
+
 module.exports = mongoose.model('Review', ReviewSchema);
