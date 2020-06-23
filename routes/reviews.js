@@ -9,6 +9,7 @@ const {
 
 const {
     getReviews,
+    getReviewsById,
 } = require('../controllers/reviews');
 
 const router = express.Router();
@@ -20,7 +21,11 @@ router
             path: 'bootcamp',
             select: 'name description',
         }
-    ), getReviews);
+    ), getReviews)
+
+router
+    .route('/:id')
+    .get(getReviewsById);
 
 
 module.exports = router;

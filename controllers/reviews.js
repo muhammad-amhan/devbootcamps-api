@@ -12,7 +12,7 @@ const getReviews = asyncHandler(async function(req, res, next) {
         const reviews = await Review.find({ bootcamp: req.params.bootcampId });
 
         if (courses.length === 0) {
-            return next(new ErrorResponse('No Reviews available', 404));
+            return next(new ErrorResponse('Review not found', 404));
         }
 
         res.status(200).json({
@@ -26,7 +26,27 @@ const getReviews = asyncHandler(async function(req, res, next) {
     }
 });
 
+// @description         Get a review by ID
+// @route               PUT /api/v1/reviews/:id
+// @access              Public
+const getReviewsById = asyncHandler(async function (req, res, next) {
+    const reviews = await Review.findById(req.params.id).populate({
+        path: 'bootcamp',
+        select: 'name',
+    });
+
+    if (!reviews) {
+        return next(new ErrorResponse('No reviews available', 404));
+    }
+
+    res.status(200).json({
+        success: true,
+        data: reviews,
+    });
+});
+
 
 module.exports = {
     getReviews,
+    getReviewsById,
 }
