@@ -12,7 +12,7 @@ const {
     getReviewsById,
 } = require('../controllers/reviews');
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router
     .route('/')

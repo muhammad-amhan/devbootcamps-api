@@ -11,7 +11,7 @@ const getReviews = asyncHandler(async function(req, res, next) {
     if (req.params.bootcampId) {
         const reviews = await Review.find({ bootcamp: req.params.bootcampId });
 
-        if (courses.length === 0) {
+        if (reviews.length === 0) {
             return next(new ErrorResponse('Review not found', 404));
         }
 
