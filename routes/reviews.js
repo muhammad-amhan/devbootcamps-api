@@ -11,6 +11,8 @@ const {
     getReviews,
     getReviewsById,
     createReview,
+    updateReview,
+    deleteReview,
 } = require('../controllers/reviews');
 
 const router = express.Router({ mergeParams: true });
@@ -27,7 +29,9 @@ router
 
 router
     .route('/:id')
-    .get(getReviewsById);
+    .get(getReviewsById)
+    .put(requireToken, verifyUserRole('user', 'admin'), updateReview)
+    .delete(requireToken, verifyUserRole('user', 'admin'), deleteReview);
 
 
 module.exports = router;

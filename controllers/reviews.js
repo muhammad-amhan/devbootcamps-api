@@ -67,8 +67,60 @@ const createReview = asyncHandler(async function (req, res, next) {
     });
 });
 
+// @description         Update a review
+// @route               PUT /api/v1/reviews/:id
+// @access              Private (admin, users)
+const updateReview = asyncHandler(async function (req, res, next) {
+    let review = await Review.findById(req.params.id)
+
+    if (!review) {
+        return next(new ErrorResponse('Review not found', 404));
+    }
+
+    // Object to string
+    if (review.user.toString() !== req.user.id && req.user.role !== 'admin') {
+        return next(new ErrorResponse('You do not have permission to modify the review', 401))
+    }
+
+    review = await Review.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true,
+    });
+
+    res.status(200).json({
+        success: true,
+        data: review,
+    });
+});
+
+// @description         Delete a review
+// @route               PUT /api/v1/reviews/:id
+// @access              Private (admin, users)
+const deleteReview = asyncHandler(async function (req, res, next) {
+    const review = await Review.findById(req.params.id)
+
+    if (!review) {
+        return next(new ErrorResponse('Review not found', 404));
+    }
+
+    if (review.user.toString() !== req.user.id && req.user.role !== 'admin') {
+        return next(new ErrorResponse('You do not have permission to modify the review', 401))
+    }
+
+    await review.remove();
+
+    res.status(200).json({
+        success: true,
+        message: 'Successfully deleted the review',
+        data: review,
+    });
+});
+
+
 module.exports = {
     getReviews,
     getReviewsById,
     createReview,
+    updateReview,
+    deleteReview,
 }

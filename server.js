@@ -18,8 +18,9 @@ const environment = process.env.NODE_ENV;
 
 // Development logging middleware - debug
 if (process.env.NODE_ENV === 'development') {
-    // app.use(morgan('dev')); // Using the below request logger to simulate how morgan works
-    app.use(logger);  // Custom middleware logger
+    // Using the below request logger to simulate how morgan works
+    // app.use(morgan('dev'));
+    app.use(logger);
 }
 // Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
