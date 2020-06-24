@@ -40,5 +40,36 @@ const ReviewSchema = new Schema({
 // TODO come up with a better error response
 ReviewSchema.index({ bootcamp: 1, user: 1 }, { unique: true });
 
+// Add average rating for bootcamps based on their review ratings
+ReviewSchema.statics.getAverageRating = async function(bootcampId) {
+    const obj = await this.aggregate([
+        {
+            $match: { bootcamp: bootcampId },
+        },
+        {
+            $group: {
+                _id: '$bootcamp',
+                averageRating: { $avg: '$rating' },
+            },
+        },
+    ]);
+
+    try {
+        await this.model('Bootcamp').findByIdAndUpdate(bootcampId, {
+            averageRating: obj[0].averageRating,
+        });
+    } catch (err) {
+        console.log(err.message);
+    }
+};
+
+// TODO suppress the warning about an ignored promise
+ReviewSchema.post('save', function () {
+    this.constructor.getAverageRating(this.bootcamp);
+});
+
+ReviewSchema.pre('remove', function () {
+    this.constructor.getAverageRating(this.bootcamp);
+});
 
 module.exports = mongoose.model('Review', ReviewSchema);
