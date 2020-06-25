@@ -5,6 +5,7 @@ const morgan        = require('morgan');
 const colors        = require('colors');
 const path          = require('path');
 const cookieParser  = require('cookie-parser');
+const mongoSanitize = require('express-mongo-sanitize');
 const logger        = require('./middlware/logger');
 const connectDB     = require('./settings/database');
 const errorHandler  = require('./middlware/error_handler');
@@ -32,12 +33,11 @@ const auth      = require('./routes/auth');
 const users     = require('./routes/users');
 const reviews   = require('./routes/reviews');
 
-// JSON request body parser
+// Mount middleware such as JSON and cookies parser
 app.use(express.json());
-// File upload
 app.use(fileUpload({}));
-// Cookie parser
 app.use(cookieParser());
+app.use(mongoSanitize());
 
 // Mount resources
 app.use('/api/v1/bootcamps', bootcamps);
