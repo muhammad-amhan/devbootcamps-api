@@ -10,9 +10,9 @@ const requireToken = asyncHandler(async function (req, res, next) {
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         jwt_token = req.headers.authorization.split(' ')[1];
     }
-    // else if (req.cookies.jwt_token) {
-    //     token = req.cookies.jwt_token;
-    // }
+    else if (req.cookies.jwt_token) {
+        jwt_token = req.cookies.jwt_token;
+    }
 
     if (!jwt_token) {
         return next(new ErrorResponse('Not authenticated', 401));

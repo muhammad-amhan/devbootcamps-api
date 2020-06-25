@@ -184,6 +184,21 @@ const sendToken = function (user, res, message) {
         });
 };
 
+// @description         Log users out
+// @route               POST /api/v1/auth/logout
+// @access              Private
+const logout = asyncHandler(async function (req, res, next) {
+    res.cookie('jwt_token', 'none', {
+        expires: new Date(Date.now() + 10 * 1000),
+        httpOnly: true,
+    });
+
+    res.status(200).json({
+        success: true,
+        message: 'Successfully logged out',
+    });
+});
+
 
 module.exports = {
     registerUser,
@@ -193,4 +208,5 @@ module.exports = {
     resetPassword,
     updateUserDetails,
     updateUserPassword,
+    logout,
 };
