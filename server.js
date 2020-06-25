@@ -10,6 +10,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xssClean      = require('xss-clean');
 const rateLimit     = require('express-rate-limit');
 const hpp           = require('hpp');
+const cors          = require('cors');
 const logger        = require('./middlware/logger');
 const connectDB     = require('./settings/database');
 const errorHandler  = require('./middlware/error_handler');
@@ -55,6 +56,7 @@ app.use(helmet());              // Adds few additional headers for more security
 app.use(xssClean());            // Prevent XSS e.g. attackers won't be able to add <script> tags in names or titles or any field
 app.use(limiter);
 app.use(hpp());                 // Prevent HTTP param pollution
+app.use(cors());                // Avoiding cross origin error when attempting to connect to the API from a different domain
 
 // Mount resources
 app.use('/api/v1/bootcamps', bootcamps);
