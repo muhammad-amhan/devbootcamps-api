@@ -5,7 +5,9 @@ const morgan        = require('morgan');
 const colors        = require('colors');
 const path          = require('path');
 const cookieParser  = require('cookie-parser');
+const helmet        = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
+const xssClean      = require('xss-clean');
 const logger        = require('./middlware/logger');
 const connectDB     = require('./settings/database');
 const errorHandler  = require('./middlware/error_handler');
@@ -37,7 +39,12 @@ const reviews   = require('./routes/reviews');
 app.use(express.json());
 app.use(fileUpload({}));
 app.use(cookieParser());
+// Security middleware
 app.use(mongoSanitize());
+// Adds few additional headers for more security
+app.use(helmet());
+// Prevent XSS e.g. attackers won't be able to add <script> tags in names or titles or any field
+app.use(xssClean());
 
 // Mount resources
 app.use('/api/v1/bootcamps', bootcamps);
