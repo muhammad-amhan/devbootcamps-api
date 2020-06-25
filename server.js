@@ -8,6 +8,8 @@ const cookieParser  = require('cookie-parser');
 const helmet        = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xssClean      = require('xss-clean');
+const rateLimit     = require('express-rate-limit');
+const hpp           = require('hpp');
 const logger        = require('./middlware/logger');
 const connectDB     = require('./settings/database');
 const errorHandler  = require('./middlware/error_handler');
@@ -35,16 +37,24 @@ const auth      = require('./routes/auth');
 const users     = require('./routes/users');
 const reviews   = require('./routes/reviews');
 
+// Limiting request rate
+const limiter = rateLimit({
+    windowMs: 10 * 60 * 1000, // 10 minutes
+    max: 100,
+    message: 'Temporarily blocked from making requests',
+    statusCode: 429,
+    skipSuccessfulRequests: true,
+});
+
 // Mount middleware such as JSON and cookies parser
 app.use(express.json());
 app.use(fileUpload({}));
 app.use(cookieParser());
-// Security middleware
-app.use(mongoSanitize());
-// Adds few additional headers for more security
-app.use(helmet());
-// Prevent XSS e.g. attackers won't be able to add <script> tags in names or titles or any field
-app.use(xssClean());
+app.use(mongoSanitize());       // Security middleware
+app.use(helmet());              // Adds few additional headers for more security
+app.use(xssClean());            // Prevent XSS e.g. attackers won't be able to add <script> tags in names or titles or any field
+app.use(limiter);
+app.use(hpp());                 // Prevent HTTP param pollution
 
 // Mount resources
 app.use('/api/v1/bootcamps', bootcamps);
@@ -53,7 +63,7 @@ app.use('/api/v1/auth', auth);
 app.use('/api/v1/users', users);
 app.use('/api/v1/reviews', reviews);
 
-// Custom error handler - every middleware must run through app.use()
+// Custom error handler
 // to be user in other resources such as bootcamps, it must come after mounting other resources
 app.use(errorHandler);
 
