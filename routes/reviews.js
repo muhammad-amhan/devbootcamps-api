@@ -10,7 +10,7 @@ const {
 const {
     getAllReviews,
     getReviews,
-    getReviewsById,
+    getReviewById,
     createReview,
     updateReview,
     deleteReview,
@@ -20,7 +20,7 @@ const router = express.Router({ mergeParams: true });
 
 router
     .route('/reviews/:id([a-z0-9]{24})')
-    .get(getReviewsById)
+    .get(getReviewById)
     .put(requireToken, verifyUserRole('user', 'admin'), updateReview)
     .delete(requireToken, verifyUserRole('user', 'admin'), deleteReview);
 

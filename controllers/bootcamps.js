@@ -30,14 +30,10 @@ const getBootcampByLocationRadius = asyncHandler(async function (req, res, next)
     });
 
     if (bootcamps.length === 0) {
-        return next(new ErrorResponse('No bootcamps found in this region, try to expand your circle.', 404))
+        return next(new ErrorResponse('Bootcamps not found in this region', 404))
     }
 
-    res.status(200).json({
-        success: true,
-        count: bootcamps.length,
-        data: bootcamps,
-    });
+    res.status(200).json(res.results);
 });
 
 
@@ -60,7 +56,7 @@ const getBootcampById = asyncHandler(async function (req, res, next) {
 
 // @description         Create a new bootcamp
 // @route               POST /api/v1/bootcamps
-// @access              Private
+// @access              Private (publisher, admin)
 const createBootcamp = asyncHandler(async function (req, res, next) {
     // A publisher can publish one bootcamp only
     const publishedBootcamp = await Bootcamp.findOne({ user: req.user.id })
@@ -81,7 +77,7 @@ const createBootcamp = asyncHandler(async function (req, res, next) {
 
 // @description         Update a bootcamp
 // @route               PUT /api/v1/bootcamps/:id
-// @access              Private
+// @access              Private (bootcamp owner, admin)
 const updateBootcamp = asyncHandler(async function (req, res, next) {
     let bootcamp = await Bootcamp.findById(req.params.id);
 
@@ -131,7 +127,7 @@ const deleteBootcamp = asyncHandler(async function (req, res, next) {
 
 // @description         Upload bootcamp photo
 // @route               PUT /api/v1/bootcamps/:id/photo
-// @access              Private
+// @access              Private (bootcamp owner, admin)
 const uploadBootcampPhoto = asyncHandler(async function (req, res, next) {
     const bootcamp = await Bootcamp.findById(req.params.id);
 

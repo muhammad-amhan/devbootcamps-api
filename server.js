@@ -14,6 +14,7 @@ const cors          = require('cors');
 const logger        = require('./middlware/logger');
 const connectDB     = require('./settings/database');
 const errorHandler  = require('./middlware/error_handler');
+const ErrorResponse = require('./utils/error_response');
 
 env.config({ path: './settings/config.env' });
 connectDB();
@@ -67,10 +68,7 @@ app.use('/api/v1/users', users);
 
 // Default route (404)
 app.all('*', function (req, res, next) {
-    res.status(404).json({
-        success: false,
-        message: 'Endpoint Not Found',
-    })
+    return next(new ErrorResponse('Resource Not Found', 404));
 });
 
 // Custom error handler

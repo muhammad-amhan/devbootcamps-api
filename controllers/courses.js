@@ -15,23 +15,32 @@ const getAllCourses = asyncHandler(async function (req, res, next) {
 // @access              Public
 const getCourses = asyncHandler(async function(req, res, next) {
     /** @namespace req.params.bootcampId **/
-    const courses = await Course.find({bootcamp: req.params.bootcampId});
+    // Under the hood, it is equivalent to Model.findOne({ answer: 42 }).select({ _id: 1 }).lean()
+    const bootcampExists = await Bootcamp.exists({ _id: req.params.bootcampId });
+
+    if (!bootcampExists) {
+        return next(new ErrorResponse('Bootcamp not found', 404));
+    }
+
+    const courses = await Course.find({ bootcamp: req.params.bootcampId });
 
     if (courses.length === 0) {
         return next(new ErrorResponse('No courses have been published yet', 404));
     }
 
-    res.status(200).json({
-        success: true,
-        count: courses.length,
-        data: courses,
-    });
+    res.status(200).json(res.results);
 });
 
 // @description         Get a course by ID
 // @route               GET /api/v1/bootcamps/:bootcampId/courses/:id
 // @access              Public
 const getCourseById = asyncHandler(async function (req, res, next) {
+    const bootcampExists = await Bootcamp.exists({ _id: req.params.bootcampId });
+
+    if (!bootcampExists) {
+        return next(new ErrorResponse('Bootcamp not found', 404));
+    }
+
     const course = await Course.findById(req.params.id).populate({
         path: 'bootcamp',
         select: 'name',
@@ -49,13 +58,13 @@ const getCourseById = asyncHandler(async function (req, res, next) {
 
 // @description         Add a new course to a bootcamp
 // @route               POST /api/v1/bootcamps/:bootcampId/courses
-// @access              Private
+// @access              Private (bootcamp owner, admin)
 const createCourse = asyncHandler(async function (req, res, next) {
     req.body.bootcamp = req.params.bootcampId;
     const bootcamp = await Bootcamp.findById(req.params.bootcampId);
 
     if (!bootcamp) {
-        return next(new ErrorResponse('Cannot create course because the bootcamp is not found', 404));
+        return next(new ErrorResponse('Bootcamp is not found', 404));
     }
 
     // Verify the user is the owner of the bootcamp where the course is published
@@ -75,10 +84,15 @@ const createCourse = asyncHandler(async function (req, res, next) {
 
 // @description         Update a course
 // @route               PUT /api/v1/bootcamp/:bootcampId/courses/:id
-// @access              Private
+// @access              Private (course owner, admin)
 const updateCourse = asyncHandler(async function (req, res, next) {
-    let course = await Course.findById(req.params.id);
+    const bootcampExists = await Bootcamp.exists({ _id: req.params.bootcampId });
 
+    if (!bootcampExists) {
+        return next(new ErrorResponse('Bootcamp not found', 404));
+    }
+
+    let course = await Course.findById(req.params.id);
     if (!course) {
         return next(new ErrorResponse('Course not found', 404));
     }
@@ -101,8 +115,14 @@ const updateCourse = asyncHandler(async function (req, res, next) {
 
 // @description         Delete a course
 // @route               DELETE /api/v1/bootcamp/:bootcampId/courses/:id
-// @access              Private
+// @access              Private (course owner, admin)
 const deleteCourse = asyncHandler(async function (req, res, next) {
+    const bootcampExists = await Bootcamp.exists({ _id: req.params.bootcampId });
+
+    if (!bootcampExists) {
+        return next(new ErrorResponse('Bootcamp not found', 404));
+    }
+
     const course = await Course.findById(req.params.id);
 
     if (!course) {

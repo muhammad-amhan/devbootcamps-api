@@ -39,7 +39,7 @@ const requireToken = asyncHandler(async function (req, res, next) {
 const verifyUserRole = (...roles) => {
     return (req, res, next) => {
         if (!roles.includes(req.user.role)) {
-            return next(new ErrorResponse(`User does not have permission to modify this resource`, 403));
+            return next(new ErrorResponse('Forbidden', 403));
         }
         next();
     };
