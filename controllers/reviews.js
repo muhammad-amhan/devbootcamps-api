@@ -3,32 +3,33 @@ const asyncHandler  = require('../middlware/async_handler');
 const Review        = require('../models/Review');
 const Bootcamp      = require('../models/Bootcamp');
 
-// @description         Get all reviews for a specific bootcamp for forwarded route and all courses otherwise
-// @forwardedRoute      GET /api/v1/bootcamps/:bootcampId/reviews
+// @description         Get all reviews
 // @route               GET /api/v1/reviews
+// @access              Public
+const getAllReviews = asyncHandler(async function () {
+    res.status(200).json(res.results);
+});
+
+// @description         Get all reviews for a specific bootcamp
+// @route               GET /api/v1/bootcamps/:bootcampId/reviews
 // @access              Public
 const getReviews = asyncHandler(async function(req, res, next) {
     /** @namespace req.params.bootcampId **/
-    if (req.params.bootcampId) {
-        const reviews = await Review.find({ bootcamp: req.params.bootcampId });
+    const reviews = await Review.find({ bootcamp: req.params.bootcampId });
 
-        if (reviews.length === 0) {
-            return next(new ErrorResponse('Review not found', 404));
-        }
-
-        res.status(200).json({
-            success: true,
-            count: reviews.length,
-            data: reviews,
-        });
-
-    } else {
-        res.status(200).json(res.results);
+    if (reviews.length === 0) {
+        return next(new ErrorResponse('Review not found', 404));
     }
+
+    res.status(200).json({
+        success: true,
+        count: reviews.length,
+        data: reviews,
+    });
 });
 
 // @description         Get a review by ID
-// @route               PUT /api/v1/reviews/:id
+// @route               GET /api/v1/bootcamps/:bootcampId/reviews/:id
 // @access              Public
 const getReviewsById = asyncHandler(async function (req, res, next) {
     const reviews = await Review.findById(req.params.id).populate({
@@ -68,7 +69,7 @@ const createReview = asyncHandler(async function (req, res, next) {
 });
 
 // @description         Update a review
-// @route               PUT /api/v1/reviews/:id
+// @route               PUT /api/v1/bootcamps/:bootcampId/reviews/:id
 // @access              Private (admin, users)
 const updateReview = asyncHandler(async function (req, res, next) {
     let review = await Review.findById(req.params.id)
@@ -94,7 +95,7 @@ const updateReview = asyncHandler(async function (req, res, next) {
 });
 
 // @description         Delete a review
-// @route               PUT /api/v1/reviews/:id
+// @route               DELETE /api/v1/bootcamps/:bootcampId/reviews/:id
 // @access              Private (admin, users)
 const deleteReview = asyncHandler(async function (req, res, next) {
     const review = await Review.findById(req.params.id)
@@ -118,6 +119,7 @@ const deleteReview = asyncHandler(async function (req, res, next) {
 
 
 module.exports = {
+    getAllReviews,
     getReviews,
     getReviewsById,
     createReview,

@@ -8,6 +8,7 @@ const {
 } = require('../middlware/auth');
 
 const {
+    getAllReviews,
     getReviews,
     getReviewsById,
     createReview,
@@ -18,7 +19,13 @@ const {
 const router = express.Router({ mergeParams: true });
 
 router
-    .route('/')
+    .route('/reviews/:id([a-z0-9]{24})')
+    .get(getReviewsById)
+    .put(requireToken, verifyUserRole('user', 'admin'), updateReview)
+    .delete(requireToken, verifyUserRole('user', 'admin'), deleteReview);
+
+router
+    .route('/reviews')
     .get(filterResults(Review,'Reviews',
         {
             path: 'bootcamp',
@@ -28,10 +35,13 @@ router
     .post(requireToken, verifyUserRole('user', 'admin'), createReview);
 
 router
-    .route('/:id')
-    .get(getReviewsById)
-    .put(requireToken, verifyUserRole('user', 'admin'), updateReview)
-    .delete(requireToken, verifyUserRole('user', 'admin'), deleteReview);
+    .route('/\/?$')
+    .get(filterResults(Review,'Reviews',
+        {
+            path: 'bootcamp',
+            select: 'name description',
+        }
+    ), getAllReviews);
 
 
 module.exports = router;

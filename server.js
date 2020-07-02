@@ -60,10 +60,18 @@ app.use(cors());                // Avoiding cross origin error when attempting t
 
 // Mount resources
 app.use('/api/v1/bootcamps', bootcamps);
-app.use('/api/v1/courses', courses);
+app.use('/api/v1/courses/?$', courses);
+app.use('/api/v1/reviews/?$', reviews);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/users', users);
-app.use('/api/v1/reviews', reviews);
+
+// Default route (404)
+app.all('*', function (req, res, next) {
+    res.status(404).json({
+        success: false,
+        message: 'Endpoint Not Found',
+    })
+});
 
 // Custom error handler
 // to be user in other resources such as bootcamps, it must come after mounting other resources

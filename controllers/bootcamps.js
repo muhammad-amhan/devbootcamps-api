@@ -5,6 +5,13 @@ const asyncHandler  = require('../middlware/async_handler');
 const path          = require('path');
 
 // @description         Get all bootcamps
+// @route               GET /api/v1/bootcamps
+// @access              Public
+const getBootcamps = asyncHandler(async function (req, res, next) {
+    res.status(200).json(res.results);
+});
+
+// @description         Get all bootcamps
 // @route               GET /api/v1/bootcamps/:postcode/:distance
 // @access              Public
 const getBootcampByLocationRadius = asyncHandler(async function (req, res, next) {
@@ -33,14 +40,8 @@ const getBootcampByLocationRadius = asyncHandler(async function (req, res, next)
     });
 });
 
-// @description         Get all bootcamps
-// @route               GET /api/v1/bootcamps
-// @access              Public
-const getBootcamps = asyncHandler(async function (req, res, next) {
-    res.status(200).json(res.results);
-});
 
-// @description         Get a single bootcamp
+// @description         Get bootcamp by ID
 // @route               GET /api/v1/bootcamps/:id
 // @access              Public
 const getBootcampById = asyncHandler(async function (req, res, next) {
@@ -78,7 +79,7 @@ const createBootcamp = asyncHandler(async function (req, res, next) {
     });
 });
 
-// @description         Update a single bootcamp
+// @description         Update a bootcamp
 // @route               PUT /api/v1/bootcamps/:id
 // @access              Private
 const updateBootcamp = asyncHandler(async function (req, res, next) {
@@ -104,7 +105,7 @@ const updateBootcamp = asyncHandler(async function (req, res, next) {
     });
 });
 
-// @description         Delete a single bootcamp
+// @description         Delete a bootcamp
 // @route               DELETE /api/v1/bootcamps/:id
 // @access              Private
 const deleteBootcamp = asyncHandler(async function (req, res, next) {
@@ -128,7 +129,7 @@ const deleteBootcamp = asyncHandler(async function (req, res, next) {
     });
 });
 
-// @description         Upload photo for a bootcamp
+// @description         Upload bootcamp photo
 // @route               PUT /api/v1/bootcamps/:id/photo
 // @access              Private
 const uploadBootcampPhoto = asyncHandler(async function (req, res, next) {

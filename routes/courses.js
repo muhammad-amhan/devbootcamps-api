@@ -1,6 +1,7 @@
 const express = require('express');
 
 const {
+    getAllCourses,
     getCourses,
     getCourseById,
     createCourse,
@@ -12,11 +13,17 @@ const filterResults    = require('../middlware/data_filter');
 const { requireToken } = require('../middlware/auth');
 
 const Course = require('../models/Course');
-// Merging params because we shared this router in bootcamps
+// Merging params with other resources so we can have access to their params
 const router = express.Router({ mergeParams: true });
 
 router
-    .route('/')
+    .route('/courses/:id([a-z0-9]{24})')
+    .get(getCourseById)
+    .put(requireToken, updateCourse)
+    .delete(requireToken, deleteCourse);
+
+router
+    .route('/courses')
     .get(
         filterResults(Course, 'Courses',{
             path: 'bootcamp',
@@ -25,10 +32,12 @@ router
     .post(requireToken, createCourse);
 
 router
-    .route('/:id')
-    .get(getCourseById)
-    .put(requireToken, updateCourse)
-    .delete(requireToken, deleteCourse);
+    .route(new RegExp('/\/?$'))
+    .get(
+        filterResults(Course, 'Courses',{
+            path: 'bootcamp',
+            select: 'name',
+        }), getAllCourses);
 
 
 module.exports = router;

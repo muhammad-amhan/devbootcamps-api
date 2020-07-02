@@ -11,7 +11,7 @@ const getUsers = asyncHandler(async function (req, res, next) {
     res.status(200).json(res.results);
 });
 
-// @description         Get a single user by ID
+// @description         Get a user by ID
 // @route               GET /api/v1/users/:id
 // @access              Private (admins)
 const getUserById = asyncHandler(async function (req, res, next) {

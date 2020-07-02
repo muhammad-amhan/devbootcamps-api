@@ -3,33 +3,33 @@ const asyncHandler  = require('../middlware/async_handler');
 const Course        = require('../models/Course');
 const Bootcamp      = require('../models/Bootcamp');
 
-// @description         Get all courses for a specific bootcamp for forwarded route and all courses otherwise
+// @description         Get all courses
+// @forwardedRoute      GET /api/v1/courses
+// @access              Public
+const getAllCourses = asyncHandler(async function (req, res, next) {
+    res.status(200).json(res.results);
+});
+
+// @description         Get all courses for a specific bootcamp
 // @forwardedRoute      GET /api/v1/bootcamps/:bootcampId/courses
-// @route               GET /api/v1/courses
 // @access              Public
 const getCourses = asyncHandler(async function(req, res, next) {
     /** @namespace req.params.bootcampId **/
-    if (req.params.bootcampId) {
-        const courses = await Course.find({ bootcamp: req.params.bootcampId });
+    const courses = await Course.find({bootcamp: req.params.bootcampId});
 
-        if (courses.length === 0) {
-            return next(new ErrorResponse('No courses have been published yet', 404));
-        }
-
-        res.status(200).json({
-            success: true,
-            count: courses.length,
-            data: courses,
-        });
-
-    } else {
-        res.status(200).json(res.results);
+    if (courses.length === 0) {
+        return next(new ErrorResponse('No courses have been published yet', 404));
     }
+
+    res.status(200).json({
+        success: true,
+        count: courses.length,
+        data: courses,
+    });
 });
 
-// @description         Get a single course by ID
+// @description         Get a course by ID
 // @route               GET /api/v1/bootcamps/:bootcampId/courses/:id
-// @route               PUT /api/v1/courses/:id
 // @access              Public
 const getCourseById = asyncHandler(async function (req, res, next) {
     const course = await Course.findById(req.params.id).populate({
@@ -75,7 +75,6 @@ const createCourse = asyncHandler(async function (req, res, next) {
 
 // @description         Update a course
 // @route               PUT /api/v1/bootcamp/:bootcampId/courses/:id
-// @route               PUT /api/v1/courses/:id
 // @access              Private
 const updateCourse = asyncHandler(async function (req, res, next) {
     let course = await Course.findById(req.params.id);
@@ -102,7 +101,6 @@ const updateCourse = asyncHandler(async function (req, res, next) {
 
 // @description         Delete a course
 // @route               DELETE /api/v1/bootcamp/:bootcampId/courses/:id
-// @route               DELETE /api/v1/courses/:id
 // @access              Private
 const deleteCourse = asyncHandler(async function (req, res, next) {
     const course = await Course.findById(req.params.id);
@@ -123,7 +121,9 @@ const deleteCourse = asyncHandler(async function (req, res, next) {
     });
 });
 
+
 module.exports = {
+    getAllCourses,
     getCourses,
     getCourseById,
     createCourse,
