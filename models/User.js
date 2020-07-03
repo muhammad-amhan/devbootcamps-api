@@ -2,18 +2,23 @@ const mongoose = require('mongoose');
 const bcrypt   = require('bcryptjs');
 const jwt      = require('jsonwebtoken');
 const crypto   = require('crypto');
+const mongooseValidation = require('mongoose-beautiful-unique-validation');
 
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
-    name: {
+    firstName: {
         type: String,
-        required: [true, 'Name is required'],
+        required: [true, 'First name is required'],
+    },
+    surname: {
+        type: String,
+        required: [true, 'Surname is required'],
     },
     email: {
         type: String,
         trim: true,
-        unique: true,
+        unique: 'Email is already registered',
         match: [
             /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
             'Please enter a valid email',
@@ -38,6 +43,11 @@ const UserSchema = new Schema({
         type: Date,
         default: Date.now(),
     },
+},
+{
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+
 });
 
 // Encrypt password
@@ -78,5 +88,13 @@ UserSchema.methods.getResetPasswordToken = function () {
 
     return resetToken;
 };
+
+UserSchema.virtual('fullName').get(function () {
+    return this.firstName + ' ' + this.surname;
+});
+
+// Enable mongoose beautiful validation on this schema
+UserSchema.plugin(mongooseValidation);
+
 
 module.exports = mongoose.model('User', UserSchema);

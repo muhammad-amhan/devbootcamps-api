@@ -15,7 +15,7 @@ const requireToken = asyncHandler(async function (req, res, next) {
     }
 
     if (!jwt_token) {
-        return next(new ErrorResponse('Not authenticated', 401));
+        return next(new ErrorResponse('Not Authenticated', 401));
     }
 
     try {
@@ -31,7 +31,7 @@ const requireToken = asyncHandler(async function (req, res, next) {
         next();
 
     } catch (err) {
-        return next(new ErrorResponse('Not authenticated', 401));
+        return next(new ErrorResponse('Not Authenticated', 401));
     }
 });
 

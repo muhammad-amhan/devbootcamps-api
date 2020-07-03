@@ -1,6 +1,7 @@
 const mongoose  = require('mongoose');
 const slugify   = require('slugify');
 const geocoder  = require('../utils/geocoder');
+const mongooseValidation = require('mongoose-beautiful-unique-validation');
 
 const Schema = mongoose.Schema;
 
@@ -8,7 +9,7 @@ const BootcampSchema = new Schema({
     name: {
         type: String,
         required: [true, 'Please enter a name'],
-        unique: true,
+        unique: 'Bootcamp name is already taken',
         trim: true,
         maxlength: [50, 'Name cannot exceed 50 characters'], // or 50 if we don't add a custom message
     },
@@ -151,5 +152,8 @@ BootcampSchema.virtual('courses', {
     foreignField: 'bootcamp',
     justOne: false,
 });
+
+BootcampSchema.plugin(mongooseValidation);
+
 
 module.exports = mongoose.model('Bootcamp', BootcampSchema);

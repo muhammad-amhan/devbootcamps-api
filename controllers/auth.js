@@ -8,10 +8,7 @@ const User          = require('../models/User');
 // @route               POST /api/v1/auth/register
 // @access              Public
 const registerUser = asyncHandler(async function (req, res, next) {
-    const { name, email, password, role } = req.body;
-    // Instance methods of User model can be called on `user`
-    const user = await User.create({ name, email, password, role });
-
+    const user = await User.create(req.body);
     sendToken(user, res, 'Registered successfully');
 });
 
@@ -24,7 +21,7 @@ const login = asyncHandler(async function (req, res, next) {
     if (!email || !password) {
         return next(new ErrorResponse('Email and password are required', 400));
     }
-    // Search for user by email
+    // Search for the user by email
     const user = await User.findOne({ email: email }).select('+password');
     if (!user) {
         return next(new ErrorResponse('Incorrect email or password'), 401);
@@ -35,7 +32,7 @@ const login = asyncHandler(async function (req, res, next) {
         return next(new ErrorResponse('Incorrect email or password'), 401);
     }
 
-    sendToken(user, res, `Welcome ${user.name}`);
+    sendToken(user, res, `Welcome, ${user.firstName}!`);
 });
 
 // @description         Get current logged in user
@@ -63,7 +60,6 @@ const updateUserPassword = asyncHandler(async function (req, res, next) {
 
     /** @namespace req.body.newPassword **/
     user.password = req.body.newPassword;
-
     await user.save();
 
     sendToken(user, res, 'Successfully updated your password');
@@ -74,7 +70,8 @@ const updateUserPassword = asyncHandler(async function (req, res, next) {
 // @access              Private
 const updateUserDetails = asyncHandler(async function (req, res, next) {
     const fields = {
-        name: req.body.name,
+        firstName: req.body.firstName,
+        surname: req.body.surname,
         email: req.body.email,
     };
 
@@ -110,9 +107,9 @@ const resetPassword = asyncHandler(async function (req, res, next) {
     }
 
     user.password = req.body.password;
-
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
+
     await user.save();
 
     sendToken(user, res, 'Password changed successfully');
