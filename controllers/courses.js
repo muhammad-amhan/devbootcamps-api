@@ -64,12 +64,20 @@ const createCourse = asyncHandler(async function (req, res, next) {
     const bootcamp = await Bootcamp.findById(req.params.bootcampId);
 
     if (!bootcamp) {
-        return next(new ErrorResponse('Bootcamp is not found', 404));
+        return next(new ErrorResponse('Bootcamp not found', 404));
     }
 
     // Verify the user is the owner of the bootcamp where the course is published
     if ((bootcamp.user.toString() !== req.user.id) && (req.user.role !== 'admin')) {
         return next(new ErrorResponse('You do not have permission to add courses to this bootcamp', 401));
+    }
+
+    const courses = await Course.find({ bootcamp: req.params.bootcampId }).select('title');
+
+    for await (let course of courses) {
+        if (course.title === req.body.title) {
+            return next(new ErrorResponse(`You already have a course with the title "${req.body.title}" in your bootcamp`, 400));
+        }
     }
 
     req.body.user = req.user.id;
@@ -86,9 +94,9 @@ const createCourse = asyncHandler(async function (req, res, next) {
 // @route               PUT /api/v1/bootcamp/:bootcampId/courses/:id
 // @access              Private (course owner, admin)
 const updateCourse = asyncHandler(async function (req, res, next) {
-    const bootcampExists = await Bootcamp.exists({ _id: req.params.bootcampId });
+    const bootcamp = await Bootcamp.findById( req.params.bootcampId);
 
-    if (!bootcampExists) {
+    if (!bootcamp) {
         return next(new ErrorResponse('Bootcamp not found', 404));
     }
 
@@ -98,7 +106,11 @@ const updateCourse = asyncHandler(async function (req, res, next) {
     }
 
     if ((course.user.toString() !== req.user.id) && (req.user.role !== 'admin')) {
-        return next(new ErrorResponse(`You do not have permission to update the course "${course.title}"`, 401));
+        return next(new ErrorResponse(`You do not have permission to modify this course`, 401));
+    }
+
+    if (bootcamp.careers.includes(req.body.title)) {
+        return next(new ErrorResponse(`You already have a course with the title "${req.body.title}" in your bootcamp`));
     }
 
     course = await Course.findByIdAndUpdate(req.params.id, req.body, {
@@ -130,7 +142,7 @@ const deleteCourse = asyncHandler(async function (req, res, next) {
     }
     // Verify the user is the course owner
     if ((course.user.toString() !== req.user.id) && (req.user.role !== 'admin')) {
-        return next(new ErrorResponse('You do not have permission to delete the course', 401));
+        return next(new ErrorResponse('You do not have permission to modify this course', 401));
     }
 
     await course.remove();

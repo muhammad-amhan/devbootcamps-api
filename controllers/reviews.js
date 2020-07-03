@@ -6,7 +6,7 @@ const Bootcamp      = require('../models/Bootcamp');
 // @description         Get all reviews
 // @route               GET /api/v1/reviews
 // @access              Public
-const getAllReviews = asyncHandler(async function () {
+const getAllReviews = asyncHandler(async function (req, res, next) {
     res.status(200).json(res.results);
 });
 
@@ -65,6 +65,15 @@ const createReview = asyncHandler(async function (req, res, next) {
         return next(new ErrorResponse('Bootcamp not found', 404));
     }
 
+    const reviewExists = await Review.exists({
+        user: req.user.id,
+        bootcamp: req.params.bootcampId,
+    });
+
+    if (reviewExists) {
+        return next(new ErrorResponse('You have already posted a review about this bootcamp', 400));
+    }
+    
     req.body.user = req.user.id;
     const review = await Review.create(req.body);
 

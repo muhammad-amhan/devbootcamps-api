@@ -92,3 +92,10 @@ process.on('unhandledRejection', (err, promise) => {
    server.close(() => { process.exit(1); });
 });
 
+// TODO
+//  1) (done) Publishers shouldn't be able to post identical course title within their bootcamps
+//  2) (done) Each user can post a single review for each bootcamp
+//  3) Email address must be unique across all users
+//  4) Require firstName and surname
+//  5) Send an activation email
+//  6) Refresh tokens

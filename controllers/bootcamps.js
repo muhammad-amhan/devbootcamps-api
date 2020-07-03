@@ -62,7 +62,7 @@ const createBootcamp = asyncHandler(async function (req, res, next) {
     const publishedBootcamp = await Bootcamp.findOne({ user: req.user.id })
 
     if (publishedBootcamp && req.user.role !== 'admin') {
-        return next(new ErrorResponse(`You have already published one bootcamp: "${publishedBootcamp.name}"`, 400));
+        return next(new ErrorResponse(`You have already published a bootcamp "${publishedBootcamp.name}"`, 400));
     }
     // Include user in the request body
     req.body.user = req.user.id;
@@ -86,7 +86,7 @@ const updateBootcamp = asyncHandler(async function (req, res, next) {
     }
 
     if ((bootcamp.user.toString() !== req.user.id) && (req.user.role !== 'admin')) {
-        return next(new ErrorResponse(`You do not have permission to modify bootcamp "${bootcamp.name}"`, 401));
+        return next(new ErrorResponse(`You do not have permission to modify this bootcamp`, 401));
     }
 
     bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
@@ -114,7 +114,7 @@ const deleteBootcamp = asyncHandler(async function (req, res, next) {
     }
     // Verify bootcamp owner
     if ((bootcamp.user.toString() !== req.user.id) && (req.user.role !== 'admin')) {
-        return next(new ErrorResponse('You do not have permission to modify this resource', 401));
+        return next(new ErrorResponse('You do not have permission to modify this bootcamp', 401));
     }
 
     bootcamp.remove();
@@ -136,7 +136,7 @@ const uploadBootcampPhoto = asyncHandler(async function (req, res, next) {
     }
     // Verify bootcamp owner
     if ((bootcamp.user.toString() !== req.user.id) && (req.user.role !== 'admin')) {
-        return next(new ErrorResponse('You do not have permission to modify this resource', 401));
+        return next(new ErrorResponse('You do not have permission to modify this bootcamp', 401));
     }
 
     if (!req.files) {

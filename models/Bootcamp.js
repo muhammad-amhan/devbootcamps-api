@@ -22,7 +22,7 @@ const BootcampSchema = new Schema({
         type: String,
         match: [
             /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/,
-            'Please use a valid URL with http or https',
+            'Please use a valid URL e.g. https://www.example.com',
         ],
     },
     phone: {
@@ -58,7 +58,7 @@ const BootcampSchema = new Schema({
         country: String,
     },
     careers: {
-        type: [String], // Array of Strings
+        type: [String],
         required: true,
         enum: [
             'Web Development',
@@ -115,7 +115,7 @@ const BootcampSchema = new Schema({
 // Creates a slug from the bootcamp name e.g. test-bootcamp
 BootcampSchema.pre('save', function(next) {
     this.slug = slugify(this.name, { lower: true });
-    next();                                              // Move on onto the next piece of middleware
+    next();
 });
 
 // Creating a middleware to set the geo location of address field BEFORE saving to the database

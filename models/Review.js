@@ -5,7 +5,6 @@ const Schema = mongoose.Schema;
 const ReviewSchema = new Schema({
     title: {
         type: String,
-        unique: true,
         trim: true,
         maxlength: 100,
         required: [true, 'Review title is required'],
@@ -36,10 +35,6 @@ const ReviewSchema = new Schema({
     },
 });
 
-// Prevent users from adding more than one review per bootcamp
-// TODO come up with a better error response
-ReviewSchema.index({ bootcamp: 1, user: 1 }, { unique: true });
-
 // Add average rating for bootcamps based on their review ratings
 ReviewSchema.statics.getAverageRating = async function(bootcampId) {
     const obj = await this.aggregate([
@@ -65,11 +60,11 @@ ReviewSchema.statics.getAverageRating = async function(bootcampId) {
 
 // TODO suppress the warning about an ignored promise
 ReviewSchema.post('save', function () {
-    this.constructor.getAverageRating(this.bootcamp);
+    this.constructor.getAverageRating(this.bootcamp).then(() => {});
 });
 
 ReviewSchema.pre('remove', function () {
-    this.constructor.getAverageRating(this.bootcamp);
+    this.constructor.getAverageRating(this.bootcamp).then(() => {});
 });
 
 module.exports = mongoose.model('Review', ReviewSchema);
