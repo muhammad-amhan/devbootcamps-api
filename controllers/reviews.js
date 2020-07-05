@@ -43,7 +43,7 @@ const getReviewById = asyncHandler(async function (req, res, next) {
         return next(new ErrorResponse('Bootcamp not found', 404));
     }
 
-    const review = await Review.findById(req.params.id).populate({
+    const review = await Review.findOne({ _id: req.params.id, bootcamp: req.params.bootcampId }).populate({
         path: 'bootcamp',
         select: 'name',
     });
@@ -98,7 +98,7 @@ const updateReview = asyncHandler(async function (req, res, next) {
         return next(new ErrorResponse('Bootcamp not found', 404));
     }
 
-    let review = await Review.findById(req.params.id)
+    let review = await Review.findOne({ _id: req.params.id, bootcamp: req.params.bootcampId })
     if (!review) {
         return next(new ErrorResponse('Review not found', 404));
     }
@@ -129,7 +129,7 @@ const deleteReview = asyncHandler(async function (req, res, next) {
         return next(new ErrorResponse('Bootcamp not found', 404));
     }
 
-    const review = await Review.findById(req.params.id)
+    const review = await Review.findOne({ _id: req.params.id, bootcamp: req.params.bootcampId })
     if (!review) {
         return next(new ErrorResponse('Review not found', 404));
     }

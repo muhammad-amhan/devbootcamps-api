@@ -45,7 +45,7 @@ const getCourseById = asyncHandler(async function (req, res, next) {
         return next(new ErrorResponse('Bootcamp not found', 404));
     }
 
-    const course = await Course.findById(req.params.id).populate({
+    const course = await Course.findOne({ _id: req.params.id, bootcamp: req.params.bootcampId }).populate({
         path: 'bootcamp',
         select: 'name',
     });
@@ -104,7 +104,7 @@ const updateCourse = asyncHandler(async function (req, res, next) {
         return next(new ErrorResponse('Bootcamp not found', 404));
     }
 
-    let course = await Course.findById(req.params.id);
+    let course = await Course.findOne({ _id: req.params.id, bootcamp: req.params.bootcampId });
     if (!course) {
         return next(new ErrorResponse('Course not found', 404));
     }
@@ -139,7 +139,7 @@ const deleteCourse = asyncHandler(async function (req, res, next) {
         return next(new ErrorResponse('Bootcamp not found', 404));
     }
 
-    const course = await Course.findById(req.params.id);
+    const course = await Course.findOne({ _id: req.params.id, bootcamp: req.params.bootcampId });
 
     if (!course) {
         return next(new ErrorResponse('Course not found', 404));

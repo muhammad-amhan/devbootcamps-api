@@ -69,13 +69,7 @@ const updateUserPassword = asyncHandler(async function (req, res, next) {
 // @route               PUT /api/v1/auth/updatedetails
 // @access              Private
 const updateUserDetails = asyncHandler(async function (req, res, next) {
-    const fields = {
-        firstName: req.body.firstName,
-        surname: req.body.surname,
-        email: req.body.email,
-    };
-
-    const user = await User.findByIdAndUpdate(req.user.id, fields, {
+    const user = await User.findByIdAndUpdate(req.user.id, req.body, {
         new: true,
         runValidators: true,
     });
@@ -185,6 +179,7 @@ const sendToken = function (user, res, message) {
 // @route               POST /api/v1/auth/logout
 // @access              Private
 const logout = asyncHandler(async function (req, res, next) {
+    // Not actually destorying the cookies but rather setting the jwt_token to none
     res.cookie('jwt_token', 'none', {
         expires: new Date(Date.now() + 10 * 1000),
         httpOnly: true,

@@ -16,6 +16,10 @@ const connectDB     = require('./settings/database');
 const errorHandler  = require('./middlware/error_handler');
 const ErrorResponse = require('./utils/error_response');
 
+// https://github.com/thedevsaddam/docgen
+// The API documentation is in public/index.html and is generated using docgen and postman
+// It is also publicly available at: https://documenter.getpostman.com/view/7464231/SzzrXZMH?version=latest
+
 env.config({ path: './settings/config.env' });
 connectDB();
 
@@ -89,11 +93,3 @@ process.on('unhandledRejection', (err, promise) => {
    console.log(`Error: ${err.message}`.red);
    server.close(() => { process.exit(1); });
 });
-
-// TODO
-//  1) (done) Publishers shouldn't be able to post identical course title within their bootcamps
-//  2) (done) Each user can post a single review for each bootcamp
-//  3) (done) Email address must be unique across all users
-//  4) (done) Require firstName and surname
-//  5) Send an activation email
-//  6) Refresh tokens
