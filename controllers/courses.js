@@ -28,7 +28,11 @@ const getCourses = asyncHandler(async function(req, res, next) {
         return next(new ErrorResponse('No courses have been published yet', 404));
     }
 
-    res.status(200).json(res.results);
+    res.status(200).json({
+        success: true,
+        count: courses.length,
+        data: courses,
+    });
 });
 
 // @description         Get a course by ID

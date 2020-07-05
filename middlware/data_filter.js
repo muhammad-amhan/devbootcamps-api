@@ -35,7 +35,7 @@ const filterResults = (model, resourceName, populate) => async (req, res, next) 
     // Pagination
     const limit       = parseInt(req.query.limit, 10);
     const page        = parseInt(req.query.page, 10);
-    const finalLimit  = limit > 0 ? limit : 3;
+    const finalLimit  = limit > 0 ? limit : 10;
     const currentPage = page > 0 ? page : 1;
     const startIndex  = (currentPage - 1) * limit;
     const endIndex    = (currentPage * limit);

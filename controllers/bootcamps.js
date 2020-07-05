@@ -7,7 +7,7 @@ const path          = require('path');
 // @description         Get all bootcamps
 // @route               GET /api/v1/bootcamps
 // @access              Public
-const getBootcamps = asyncHandler(async function (req, res, next) {
+const getAllBootcamps = asyncHandler(async function (req, res, next) {
     res.status(200).json(res.results);
 });
 
@@ -174,7 +174,7 @@ const uploadBootcampPhoto = asyncHandler(async function (req, res, next) {
 
 // We could also export each function inline `exports.getBootcamps = ... ` instead of `const getBootcamps = ...`
 module.exports = {
-    getBootcamps,
+    getAllBootcamps,
     getBootcampById,
     updateBootcamp,
     createBootcamp,

@@ -19,29 +19,15 @@ const {
 const router = express.Router({ mergeParams: true });
 
 router
-    .route('/reviews/:id([a-z0-9]{24})')
+    .route('/:id([a-z0-9]{24})')
     .get(getReviewById)
     .put(requireToken, verifyUserRole('user', 'admin'), updateReview)
     .delete(requireToken, verifyUserRole('user', 'admin'), deleteReview);
 
 router
-    .route('/reviews')
-    .get(filterResults(Review,'Reviews',
-        {
-            path: 'bootcamp',
-            select: 'name description',
-        }
-    ), getReviews)
+    .route('/')
+    .get(getReviews)
     .post(requireToken, verifyUserRole('user', 'admin'), createReview);
-
-router
-    .route('/\/?$')
-    .get(filterResults(Review,'Reviews',
-        {
-            path: 'bootcamp',
-            select: 'name description',
-        }
-    ), getAllReviews);
 
 
 module.exports = router;

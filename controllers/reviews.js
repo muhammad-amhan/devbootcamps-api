@@ -26,7 +26,11 @@ const getReviews = asyncHandler(async function(req, res, next) {
         return next(new ErrorResponse('No available reviews', 404));
     }
 
-    res.status(200).json(res.results);
+    res.status(200).json({
+        success: true,
+        count: reviews.length,
+        data: reviews,
+    });
 });
 
 // @description         Get a review by ID

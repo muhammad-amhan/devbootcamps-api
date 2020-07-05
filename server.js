@@ -34,10 +34,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Load resources
 const bootcamps = require('./routes/bootcamps');
-const courses   = require('./routes/courses');
 const auth      = require('./routes/auth');
 const users     = require('./routes/users');
-const reviews   = require('./routes/reviews');
+const base      = require('./routes/base');
 
 // Limiting request rate
 const limiter = rateLimit({
@@ -61,10 +60,9 @@ app.use(cors());                // Avoiding cross origin error when attempting t
 
 // Mount resources
 app.use('/api/v1/bootcamps', bootcamps);
-app.use('/api/v1/courses/?$', courses);
-app.use('/api/v1/reviews/?$', reviews);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/users', users);
+app.use('/api/v1', base);
 
 // Default route (404)
 app.all('*', function (req, res, next) {

@@ -1,7 +1,6 @@
 const express = require('express');
 
 const {
-    getAllCourses,
     getCourses,
     getCourseById,
     createCourse,
@@ -17,27 +16,15 @@ const Course = require('../models/Course');
 const router = express.Router({ mergeParams: true });
 
 router
-    .route('/courses/:id([a-z0-9]{24})')
+    .route('/:id([a-z0-9]{24})')
     .get(getCourseById)
     .put(requireToken, updateCourse)
     .delete(requireToken, deleteCourse);
 
 router
-    .route('/courses')
-    .get(
-        filterResults(Course, 'Courses',{
-            path: 'bootcamp',
-            select: 'name',
-        }), getCourses)
+    .route('/')
+    .get(getCourses)
     .post(requireToken, createCourse);
-
-router
-    .route(new RegExp('/\/?$'))
-    .get(
-        filterResults(Course, 'Courses',{
-            path: 'bootcamp',
-            select: 'name',
-        }), getAllCourses);
 
 
 module.exports = router;
