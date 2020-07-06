@@ -93,3 +93,10 @@ process.on('unhandledRejection', (err, promise) => {
    console.log(`Error: ${err.message}`.red);
    server.close(() => { process.exit(1); });
 });
+
+/** TODO some ideas for future:
+ *   1) Refresh tokens
+ *   2) Provide the option to choose the slug for users profiles instead of (/auth/me)
+ *   3) Upload user profile picture
+ *   4) Confirm email upon registering
+ */
