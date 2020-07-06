@@ -1,5 +1,5 @@
 const express       = require('express');
-const env           = require('dotenv');
+const dotenv        = require('dotenv');
 const fileUpload    = require('express-fileupload');
 const morgan        = require('morgan');
 const colors        = require('colors');
@@ -20,16 +20,16 @@ const ErrorResponse = require('./utils/error_response');
 // The API documentation is in public/index.html and is generated using docgen and postman
 // It is also publicly available at: https://documenter.getpostman.com/view/7464231/SzzrXZMH?version=latest
 
-env.config({ path: './settings/config.env' });
+dotenv.config({ path: './settings/config.env' });
 connectDB();
 
 const app = express();
-const PORT = process.env.PORT;
-const environment = process.env.NODE_ENV;
+const PORT = process.env.PORT || 5000;
+const environment = process.env.NODE_ENV || 'development';
 
 // Development logging middleware - debug
 if (process.env.NODE_ENV === 'development') {
-    // Using the below request logger to simulate how morgan works
+    // Using the custom request logger instead of morgan, because why not :D
     // app.use(morgan('dev'));
     app.use(logger);
 }
@@ -77,15 +77,9 @@ app.all('*', function (req, res, next) {
 // to be user in other resources such as bootcamps, it must come after mounting other resources
 app.use(errorHandler);
 
-let port = process.argv[2] || PORT || 5000;
-
-if (port.includes('=')) {
-    port = port.split('=')[1];
-}
-
 // We assigned the server to a variable to be able to terminate the server on promise rejection exceptions
-const server = app.listen(port, () => {
-    console.log(`Server running in "${environment}" environment on port "${port}"...`.blue);
+const server = app.listen( PORT,() => {
+    console.log(`Server running in "${environment}" environment on port "${PORT}"...`.blue);
 });
 
 // This is instead of having try and catch block in `database.js` to handle promise rejection by async functions
@@ -94,9 +88,11 @@ process.on('unhandledRejection', (err, promise) => {
    server.close(() => { process.exit(1); });
 });
 
-/** TODO some ideas for future:
+/** TODO - some ideas for future:
  *   1) Refresh tokens
  *   2) Provide the option to choose the slug for users profiles instead of (/auth/me)
- *   3) Upload user profile picture
+ *   3) Upload user profile picture and create a public profile endpoint
  *   4) Confirm email upon registering
+ *   5) OAuth
+ *   6) Include deployment bash scripts to help others understand the process
  */

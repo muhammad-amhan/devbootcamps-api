@@ -46,7 +46,7 @@ const createUser = asyncHandler(async function (req, res, next) {
 // @access              Private (admins)
 const updateUser = asyncHandler(async function (req, res, next) {
     let user = await User.findById(req.params.id);
-
+    
     if (!user) {
         return next(new ErrorResponse('User not found', 404));
     }
